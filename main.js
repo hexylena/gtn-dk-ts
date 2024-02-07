@@ -167,20 +167,16 @@ layout: tutorial_hands_on
 `
 
 INPUT_PARAM = `
->{{space}}- *"{{param_label}}"*: \`{{param_value}}\`
-`
+>{{space}}- *"{{param_label}}"*: \`{{param_value}}\``
 
 INPUT_FILE_TEMPLATE = `
->{{space}}- {% icon {{icon}} %} *"{{input_name}}"*: {{input_value}}
-`.trim()
+>{{space}}- {% icon {{icon}} %} *"{{input_name}}"*: {{input_value}}`
 
 INPUT_SECTION = `
->{{space}}- In *"{{section_label}}"*:
-`
+>{{space}}- In *"{{section_label}}"*:`
 
 INPUT_ADD_REPEAT = `
->{{space}}- {% icon param-repeat %} *"Insert {{repeat_label}}"*
-`
+>{{space}}- {% icon param-repeat %} *"Insert {{repeat_label}}"*`
 
 SPACE = "    "
 
@@ -250,7 +246,9 @@ class ToolInput {
 		this.should_be_there = should_be_there || false
 		this.force_default = force_default || false
 
-		console.log(`name: ${this.name}`)
+		if(this.name == "output_cols" || this.name == "id_type") {
+			console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
+		}
 		// console.log(`name: ${this.name}`, this.wf_param_values)
 		if(this.wf_param_values[this.name] === undefined) {
 			if (should_be_there) {
@@ -264,6 +262,7 @@ class ToolInput {
 	}
 
 	get_formatted_inputs() {
+		// console.log('gfi');
 		let inputlist = ""
 		let inps = []
 		let icon;
@@ -310,7 +309,8 @@ class ToolInput {
 			}
 		} else if (this.type == "select") {
 			let param_values = []
-			for (let option in this.tool_inp_desc.options){
+			for (let option_idx in this.tool_inp_desc.options){
+				let option = this.tool_inp_desc.options[option_idx]
 				if(option[1] == this.wf_param_values){
 					param_values.push(option[0])
 				}
@@ -334,6 +334,7 @@ class ToolInput {
 	}
 
 	get_formatted_conditional_desc(){
+		// console.log('gfcd');
 		let conditional_paramlist = ""
 		let inpp = new ToolInput(
 			this.tool_inp_desc["test_param"],
@@ -349,7 +350,8 @@ class ToolInput {
 
 		// Get parameters in the when and their values
 		let tmp_tool_inp_desc = this.tool_inp_desc
-		for (let caseC in tmp_tool_inp_desc.cases) {
+		for (let caseC_idx in tmp_tool_inp_desc.cases) {
+			let caseC = tmp_tool_inp_desc.cases[caseC_idx]
 			if(caseC.value === cond_param && caseC.inputs.length > 0){
 				this.tool_inp_desc = caseC
 				conditional_paramlist += this.get_lower_param_desc()
@@ -360,6 +362,7 @@ class ToolInput {
 	}
 
 	get_lower_param_desc(){
+		console.log('glpd');
 		let sub_param_desc = "";
 		for (let inp_idx in this.tool_inp_desc.inputs){
 			let inp = this.tool_inp_desc.inputs[inp_idx]
@@ -375,16 +378,19 @@ class ToolInput {
 	}
 
 	get_formatted_repeat_desc(){
+		// console.log('gfrd');
 		let repeat_paramlist = "";
 		if (this.wf_param_values != "[]"){ 
 			let tool_inp = {}
-			for (let inp in this.tool_inp_desc.inputs){
-				// setdefault
+			for (let inp_idx in this.tool_inp_desc.inputs){
+				let inp = this.tool_inp_desc.inputs[inp_idx]
+				// TODO: setdefault
 				tool_inp[inp.name] = inp
 			}
 			let tmp_wf_param_values = structuredClone(this.wf_param_values)
 			let cur_level = this.level
-			for (let param in tmp_wf_param_values) {
+			for (let param_idx in tmp_wf_param_values) {
+				let param = tmp_wf_param_values[param_idx]
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
@@ -411,6 +417,7 @@ class ToolInput {
 	}
 
 	get_formatted_section_desc(){
+		// console.log('gfsd');
 		let section_paramlist = "";
 		let sub_param_desc = this.get_lower_param_desc();
 		if(sub_param_desc != ""){
@@ -534,6 +541,7 @@ function process_wf_step(wf_step, tool_descs, steps) {
 
 	tool_desc = tool_descs[wf_step.tool_id] || {"inputs": []};
 	let paramlist = "";
+	console.log(`# Tool ${wf_step.tool_id}`);
 	for (let inp of tool_desc.inputs) {
 		if (inp.name.startsWith("__")) {
 			continue;
@@ -546,22 +554,9 @@ function process_wf_step(wf_step, tool_descs, steps) {
 		{
 			tool_name: wf_step.name,
 			tool_id: wf_step.tool_id,
-			paramlist: "\n" + paramlist
+			paramlist: paramlist
 		}
 	);
-
-//         # get formatted param description
-//         paramlist = ""
-//         for inp in tool_desc["inputs"]:
-//             if inp["name"].startswith("__"):
-//                 continue
-//             tool_inp = ToolInput(inp, wf_param_values, steps, 1, should_be_there=True)
-//             paramlist += tool_inp.get_formatted_desc()
-//         # format the hands-on box
-//         body += templates.render(
-//             HANDS_ON_TOOL_BOX_TEMPLATE,
-//             **{"tool_name": wf_step["name"], "tool_id": wf_step["tool_id"], "paramlist": paramlist},
-//         )
 }
 
 function process_workflow(data) {
