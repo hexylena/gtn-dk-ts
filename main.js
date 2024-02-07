@@ -249,7 +249,6 @@ class ToolInput {
 		if(this.name == "output_cols" || this.name == "id_type") {
 			console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
 		}
-		// console.log(`name: ${this.name}`, this.wf_param_values)
 		if(this.wf_param_values[this.name] === undefined) {
 			if (should_be_there) {
 				throw new Error(`Parameter ${this.name} not found in wf_param_values`)
@@ -281,7 +280,6 @@ class ToolInput {
 				} else {
 					icon = 'param-file'
 				}
-				console.log('this.wf_param_values', this.wf_param_values, 'inp_type', inp_type, get_input_tool_name(inp.id, this.wf_steps))
 				inps.push(`\`${inp.output_name}\` ${get_input_tool_name(inp.id, this.wf_steps)}`)
 			}
 		}
@@ -311,9 +309,19 @@ class ToolInput {
 			let param_values = []
 			for (let option_idx in this.tool_inp_desc.options){
 				let option = this.tool_inp_desc.options[option_idx]
-				if(option[1] == this.wf_param_values){
-					param_values.push(option[0])
+				// console.log('option', option, this.wf_param_values)
+				// BEGIN DIFF vs original
+				if(Array.isArray(this.wf_param_values)){
+					if(this.wf_param_values.indexOf(option[1]) > -1){
+						console.log(`TAKING ${option[0]}`)
+						param_values.push(option[0])
+					}
+				} else {
+					if (option[1] == this.wf_param_values){
+						param_values.push(option[0])
+					}
 				}
+				// END DIFF
 			}
 			param_value = param_values.join(', ')
 		} else if (this.type == "data_column") {
@@ -362,7 +370,6 @@ class ToolInput {
 	}
 
 	get_lower_param_desc(){
-		console.log('glpd');
 		let sub_param_desc = "";
 		for (let inp_idx in this.tool_inp_desc.inputs){
 			let inp = this.tool_inp_desc.inputs[inp_idx]
@@ -378,7 +385,7 @@ class ToolInput {
 	}
 
 	get_formatted_repeat_desc(){
-		// console.log('gfrd');
+		console.log('gfrd');
 		let repeat_paramlist = "";
 		if (this.wf_param_values != "[]"){ 
 			let tool_inp = {}
@@ -390,10 +397,12 @@ class ToolInput {
 			let tmp_wf_param_values = structuredClone(this.wf_param_values)
 			let cur_level = this.level
 			for (let param_idx in tmp_wf_param_values) {
+				console.log('param_idx', param_idx)
 				let param = tmp_wf_param_values[param_idx]
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
+				console.log('paramlist_in_repeat', paramlist_in_repeat)
 				if(paramlist_in_repeat !== ""){
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
 						space: SPACE.repeat(this.level),
