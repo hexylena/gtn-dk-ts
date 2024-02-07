@@ -3,7 +3,7 @@ const HANDS_ON_TOOL_BOX_TEMPLATE = `
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [{{tool_name}}]({{tool_id}}) %} with the following parameters:{{inputlist}}{{paramlist}}
+> 1. {% tool [{{tool_name}}]({{tool_id}}) %} with the following parameters:{{paramlist}}
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -172,7 +172,7 @@ INPUT_PARAM = `
 
 INPUT_FILE_TEMPLATE = `
 >{{space}}- {% icon {{icon}} %} *"{{input_name}}"*: {{input_value}}
-`
+`.trim()
 
 INPUT_SECTION = `
 >{{space}}- In *"{{section_label}}"*:
@@ -194,6 +194,7 @@ function render_template(template, data) {
 
 		if(data[b] === undefined){
 			console.log(`Warning: ${b} is not defined in the data`)
+			return "";
 		}
 
 		return data[b];
@@ -207,6 +208,16 @@ function to_bool(string_value){
 	return string_value.toLowerCase() === "true"
 }
 
+
+function get_empty_input() {
+	return render_template(INPUT_FILE_TEMPLATE, {
+		space: SPACE,
+		icon: "param-file",
+		input_name: "Input file",
+		input_value: "File (empty input)"
+	})
+
+}
 
 function get_input_tool_name(step_id, steps){
 	let inp_provenance = ""
@@ -224,8 +235,12 @@ function get_input_tool_name(step_id, steps){
 
 class ToolInput {
 	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source) {
-		console.log('ToolInput', tool_inp_desc, 'wf_param_values', wf_param_values, level, should_be_there, force_default, source)
+		// console.log('ToolInput', tool_inp_desc, 'wf_param_values', wf_param_values, level, should_be_there, force_default, source)
+		// conso
 		this.name = tool_inp_desc.name
+		if (tool_inp_desc.type === undefined){
+			throw new Error(`No type for the parameter ${tool_inp_desc.name}`)
+		}
 		this.type = tool_inp_desc.type
 		this.tool_inp_desc = tool_inp_desc
 		this.level = level
@@ -235,7 +250,8 @@ class ToolInput {
 		this.should_be_there = should_be_there || false
 		this.force_default = force_default || false
 
-		console.log(`name: ${this.name}`, this.wf_param_values)
+		console.log(`name: ${this.name}`)
+		// console.log(`name: ${this.name}`, this.wf_param_values)
 		if(this.wf_param_values[this.name] === undefined) {
 			if (should_be_there) {
 				throw new Error(`Parameter ${this.name} not found in wf_param_values`)
@@ -261,11 +277,12 @@ class ToolInput {
 			if (inp.id){
 				// Single input or collection
 				let inp_type = this.wf_steps[inp.id].type
-				if (inp_type.includes('collection')){
+				if (inp_type.indexOf('collection') > -1){
 					icon = "param-collection"
 				} else {
 					icon = 'param-file'
 				}
+				console.log('this.wf_param_values', this.wf_param_values, 'inp_type', inp_type, get_input_tool_name(inp.id, this.wf_steps))
 				inps.push(`\`${inp.output_name}\` ${get_input_tool_name(inp.id, this.wf_steps)}`)
 			}
 		}
@@ -408,15 +425,15 @@ class ToolInput {
 	get_formatted_desc() {
 		if(this.wf_param_values){
 			if(this.type == "data" || this.type == "data_collection"){
-				this.formatted_desc = this.get_formatted_inputs()
+				this.formatted_desc += this.get_formatted_inputs()
 			} else if(this.type == "section"){
-				this.formatted_desc = this.get_formatted_section_desc()
+				this.formatted_desc += this.get_formatted_section_desc()
 			} else if(this.type == "conditional"){
-				this.formatted_desc = this.get_formatted_conditional_desc()
+				this.formatted_desc += this.get_formatted_conditional_desc()
 			} else if(this.type == "repeat"){
-				this.formatted_desc = this.get_formatted_repeat_desc()
+				this.formatted_desc += this.get_formatted_repeat_desc()
 			} else {
-				this.formatted_desc = this.get_formatted_other_param_desc()
+				this.formatted_desc += this.get_formatted_other_param_desc()
 			}
 		}
 		return this.formatted_desc
@@ -526,7 +543,11 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	}
 	return render_template(
 		HANDS_ON_TOOL_BOX_TEMPLATE,
-		{tool_name: wf_step.name, tool_id: wf_step.tool_id, paramlist: paramlist}
+		{
+			tool_name: wf_step.name,
+			tool_id: wf_step.tool_id,
+			paramlist: "\n" + paramlist
+		}
 	);
 
 //         # get formatted param description
@@ -572,11 +593,19 @@ function process_workflow(data) {
 				return step[1]
 			})
 
-		let bodies = pre_steps.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
+		let bodies = pre_steps
+			.filter((step) => {
+				return step.type != 'data_input' && step.type != 'data_collection_input';
+			})
+			.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
 
 		// write to file
+		zenodo_file_links = [];
 		const fs = require('fs');
-		final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {body: bodies});
+		final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
+			body: bodies,
+			z_file_links: zenodo_file_links.join("\n>    "),
+		});
 		fs.writeFile('hands_on_workflow.html', final_body, (err) => {
 			if (err) throw err;
 			console.log('The file has been saved!');

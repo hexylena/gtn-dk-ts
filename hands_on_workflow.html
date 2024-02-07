@@ -65,7 +65,7 @@ have fun!
 >     -> `{{ page.title }}`):
 >
 >    ```
->    undefined
+>    
 >    ```
 >    ***TODO***: *Add the files by the ones on Zenodo here (if not added)*
 >
@@ -106,110 +106,12 @@ The idea is to keep the theory description before quite simple to focus more on 
 A big step can have several subsections or sub steps:
 
 
-## Sub-step with **Input dataset collection**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Input dataset collection](null) %} with the following parameters:undefined
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **Input dataset**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Input dataset](null) %} with the following parameters:undefined
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **Input dataset collection**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Input dataset collection](null) %} with the following parameters:undefined
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
 ## Sub-step with **Column join**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Column join](toolshed.g2.bx.psu.edu/repos/iuc/collection_column_join/collection_column_join/0.0.3) %} with the following parameters:undefined
+> 1. {% tool [Column join](toolshed.g2.bx.psu.edu/repos/iuc/collection_column_join/collection_column_join/0.0.3) %} with the following parameters:
+
 >    - *"Number of header lines in each input file"*: `1`
 
 >
@@ -244,9 +146,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:undefined
+> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:
 >    - {% icon param-collection %} *"Input List"*: `output` (Input dataset collection)
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -279,9 +180,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Sort](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sort_header_tool/1.1.1) %} with the following parameters:undefined
+> 1. {% tool [Sort](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sort_header_tool/1.1.1) %} with the following parameters:
 >    - {% icon param-file %} *"Sort Query"*: `tabular_output` (output of **Column join** {% icon tool %})
-
 >    - In *"Column selections"*:
 
 >        - {% icon param-repeat %} *"Insert Column selections"*
@@ -324,9 +224,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [annotateMyIDs](toolshed.g2.bx.psu.edu/repos/iuc/annotatemyids/annotatemyids/3.16.0+galaxy1) %} with the following parameters:undefined
+> 1. {% tool [annotateMyIDs](toolshed.g2.bx.psu.edu/repos/iuc/annotatemyids/annotatemyids/3.16.0+galaxy1) %} with the following parameters:
 >    - {% icon param-file %} *"File with IDs"*: `tabular_output` (output of **Column join** {% icon tool %})
-
 >    - *"File has header?"*: `Yes`
 
 >
@@ -361,9 +260,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Replace Text](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_replace_in_line/1.1.2) %} with the following parameters:undefined
+> 1. {% tool [Replace Text](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_replace_in_line/1.1.2) %} with the following parameters:
 >    - {% icon param-file %} *"File to process"*: `outfile` (output of **Sort** {% icon tool %})
-
 >    - In *"Replacement"*:
 
 >        - {% icon param-repeat %} *"Insert Replacement"*
@@ -410,7 +308,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [limma](toolshed.g2.bx.psu.edu/repos/iuc/limma_voom/limma_voom/3.50.1+galaxy0) %} with the following parameters:undefined
+> 1. {% tool [limma](toolshed.g2.bx.psu.edu/repos/iuc/limma_voom/limma_voom/3.50.1+galaxy0) %} with the following parameters:
+
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -443,9 +342,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:undefined
+> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:
 >    - {% icon param-file %} *"Input List"*: `outTables` (output of **limma** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -478,11 +376,10 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:undefined
+> 1. {% tool [Cut](Cut1) %} with the following parameters:
+
 >    - *"Cut columns"*: `c2,c4,c7,c8`
-
 >    - {% icon param-file %} *"From"*: `output` (output of **Extract dataset** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -515,13 +412,10 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Join two Datasets](join1) %} with the following parameters:undefined
+> 1. {% tool [Join two Datasets](join1) %} with the following parameters:
 >    - {% icon param-file %} *"Join"*: `output` (output of **Extract dataset** {% icon tool %})
-
 >    - *"using column"*: `c1`
-
 >    - {% icon param-file %} *"with"*: `output` (output of **Extract dataset** {% icon tool %})
-
 >    - *"and column"*: `c1`
 
 >
@@ -556,11 +450,10 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Compute](toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.4) %} with the following parameters:undefined
+> 1. {% tool [Compute](toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.4) %} with the following parameters:
+
 >    - *"Add expression"*: `c8<0.05`
-
 >    - {% icon param-file %} *"as a new column to"*: `out_file1` (output of **Join two Datasets** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -593,11 +486,10 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:undefined
+> 1. {% tool [Cut](Cut1) %} with the following parameters:
+
 >    - *"Cut columns"*: `c1,c11,c12`
-
 >    - {% icon param-file %} *"From"*: `out_file1` (output of **Compute** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -630,9 +522,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Unique](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sorted_uniq/1.1.0) %} with the following parameters:undefined
+> 1. {% tool [Unique](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sorted_uniq/1.1.0) %} with the following parameters:
 >    - {% icon param-file %} *"File to scan for unique values"*: `out_file1` (output of **Cut** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -665,11 +556,10 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:undefined
+> 1. {% tool [Cut](Cut1) %} with the following parameters:
+
 >    - *"Cut columns"*: `c1,c3`
-
 >    - {% icon param-file %} *"From"*: `outfile` (output of **Unique** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -702,9 +592,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:undefined
+> 1. {% tool [Cut](Cut1) %} with the following parameters:
 >    - {% icon param-file %} *"From"*: `outfile` (output of **Unique** {% icon tool %})
-
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -737,11 +626,8 @@ A big step can have several subsections or sub steps:
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [goseq](toolshed.g2.bx.psu.edu/repos/iuc/goseq/goseq/1.50.0+galaxy0) %} with the following parameters:undefined
->    - {% icon param-file %} *"Differentially expressed genes file"*: `out_file1` (output of **Cut** {% icon tool %})
-
->    - {% icon param-file %} *"Gene lengths file"*: `out_file1` (output of **Cut** {% icon tool %})
-
+> 1. {% tool [goseq](toolshed.g2.bx.psu.edu/repos/iuc/goseq/goseq/1.50.0+galaxy0) %} with the following parameters:
+>    - {% icon param-file %} *"Differentially expressed genes file"*: `out_file1` (output of **Cut** {% icon tool %})>    - {% icon param-file %} *"Gene lengths file"*: `out_file1` (output of **Cut** {% icon tool %})
 >    - In *"Output Options"*:
 
 >        - *"Output Top GO terms plot?"*: `Yes`
