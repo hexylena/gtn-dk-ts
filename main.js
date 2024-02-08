@@ -254,8 +254,13 @@ function get_input_tool_name(step_id, steps){
 }
 
 class ToolInput {
-	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source) {
-		// console.log('ToolInput', tool_inp_desc, 'wf_param_values', wf_param_values, level, should_be_there, force_default, source)
+	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
+		if(source === 'y' && optional_tool_id.indexOf('uniq') > -1){
+			console.log(`ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
+				'wf_param_values', wf_param_values, 
+				level, should_be_there, force_default, source)
+		}
+
 		// conso
 		this.name = tool_inp_desc.name
 		if (tool_inp_desc.type === undefined){
@@ -366,10 +371,10 @@ class ToolInput {
 	}
 
 	get_formatted_conditional_desc(){
-		// console.log('gfcd');
+		console.log('gfcd');
 		let conditional_paramlist = ""
 		let inpp = new ToolInput(
-			this.tool_inp_desc["test_param"],
+			this.tool_inp_desc.test_param,
 			this.wf_param_values,
 			this.wf_steps,
 			this.level,
@@ -378,12 +383,14 @@ class ToolInput {
 			'z'
 		)
 		conditional_paramlist += inpp.get_formatted_desc()
-		let cond_param = this.wf_param_values
+		let cond_param = inpp.wf_param_values
 
 		// Get parameters in the when and their values
 		let tmp_tool_inp_desc = this.tool_inp_desc
+		console.log(tmp_tool_inp_desc)
 		for (let caseC_idx in tmp_tool_inp_desc.cases) {
 			let caseC = tmp_tool_inp_desc.cases[caseC_idx]
+			console.log(caseC.value, cond_param, caseC.inputs.length)
 			if(caseC.value === cond_param && caseC.inputs.length > 0){
 				this.tool_inp_desc = caseC
 				conditional_paramlist += this.get_lower_param_desc()
@@ -579,7 +586,7 @@ function process_wf_step(wf_step, tool_descs, steps) {
 		if (inp.name.startsWith("__")) {
 			continue;
 		}
-		let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y');
+		let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
 		paramlist += tool_inp.get_formatted_desc();
 	}
 	return render_template(

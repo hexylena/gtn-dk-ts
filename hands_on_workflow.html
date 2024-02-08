@@ -392,10 +392,22 @@ A big step can have several subsections or sub steps:
 > 1. {% tool [limma](toolshed.g2.bx.psu.edu/repos/iuc/limma_voom/limma_voom/3.50.1+galaxy0) %} with the following parameters:
 >    - *"Differential Expression Method"*: `limma-voom`
 >    - *"Count Files or Matrix?"*: `Single Count Matrix`
+>        - {% icon param-file %} *"Count Matrix"*: `outfile` (output of **Replace Text** {% icon tool %})
+>        - *"Input factor information from file?"*: `Yes`
+>            - {% icon param-file %} *"Factor File"*: `output` (Input dataset)
 >    - *"Use Gene Annotations?"*: `Yes`
+>        - {% icon param-file %} *"Gene Annotations"*: `out_tab` (output of **annotateMyIDs** {% icon tool %})
 >    - *"Input Contrast information from file?"*: `No`
+>        - In *"Contrast"*:
+>            - {% icon param-repeat %} *"Insert Contrast"*
+>                - *"Contrast of Interest"*: `COVID-healthy`
+>            - {% icon param-repeat %} *"Insert Contrast"*
+>                - *"Contrast of Interest"*: `3`
 >    - In *"Filter Low Counts"*:
 >        - *"Filter lowly expressed genes?"*: `Yes`
+>            - *"Filter on CPM or Count values?"*: `CPM`
+>                - *"Minimum CPM"*: `0.5`
+>                - *"Minimum Samples"*: `1`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -610,6 +622,8 @@ A big step can have several subsections or sub steps:
 > 1. {% tool [Unique](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sorted_uniq/1.1.0) %} with the following parameters:
 >    - {% icon param-file %} *"File to scan for unique values"*: `out_file1` (output of **Cut** {% icon tool %})
 >    - *"Advanced Options"*: `Show Advanced Options`
+>        - *"Column start"*: `c1`
+>        - *"Column end"*: `c1`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -715,6 +729,8 @@ A big step can have several subsections or sub steps:
 >    - {% icon param-file %} *"Differentially expressed genes file"*: `out_file1` (output of **Cut** {% icon tool %})
 >    - {% icon param-file %} *"Gene lengths file"*: `out_file1` (output of **Cut** {% icon tool %})
 >    - *"Gene categories"*: `Get categories`
+>        - *"Select Gene ID format"*: `Entrez Gene ID`
+>        - *"Select one or more categories"*: `GO: Cellular Component, GO: Biological Process, GO: Molecular Function, KEGG`
 >    - In *"Output Options"*:
 >        - *"Output Top GO terms plot?"*: `Yes`
 >        - *"Extract the DE genes for the categories (GO/KEGG terms)?"*: `Yes`
