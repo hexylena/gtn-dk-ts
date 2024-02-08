@@ -1,0 +1,724 @@
+---
+layout: tutorial_hands_on
+
+title: My Tutorial Title
+zenodo_link: 'https://zenodo.org/record/10405036'
+questions:
+- Which biological questions are addressed by the tutorial?
+- Which bioinformatics techniques are important to know for this type of data?
+objectives:
+- The learning objectives are the goals of the tutorial
+- They will be informed by your audience and will communicate to them and to yourself
+  what you should focus on during the course
+- They are single sentences describing what a learner should be able to do once they
+  have completed the tutorial
+- You can use Bloom's Taxonomy to write effective learning objectives
+time_estimation: 3H
+key_points:
+- The take-home messages
+- They will appear at the end of the tutorial
+contributions:
+  authorship:
+  - contributor1
+  editing:
+  - contributor2
+  testing:
+  - contributor3
+  funding:
+  - project-name
+---
+
+
+# Introduction
+
+<!-- This is a comment. -->
+
+General introduction about the topic and then an introduction of the
+tutorial (the questions and the objectives). It is nice also to have a
+scheme to sum up the pipeline used during the tutorial. The idea is to
+give to trainees insight into the content of the tutorial and the (theoretical
+and technical) key concepts they will learn.
+
+You may want to cite some publications; this can be done by adding citations to the
+bibliography file (`tutorial.bib` file next to your `tutorial.md` file). These citations
+must be in bibtex format. If you have the DOI for the paper you wish to cite, you can
+get the corresponding bibtex entry using [doi2bib.org](https://doi2bib.org).
+
+With the example you will find in the `tutorial.bib` file, you can add a citation to
+this article here in your tutorial like this:
+{% raw %} `{% cite Batut2018 %}`{% endraw %}.
+This will be rendered like this: {% cite Batut2018 %}, and links to a
+[bibliography section](#bibliography) which will automatically be created at the end of the
+tutorial.
+
+
+**Please follow our
+[tutorial to learn how to fill the Markdown]({{ site.baseurl }}/topics/contributing/tutorials/create-new-tutorial-content/tutorial.html)**
+
+> <agenda-title></agenda-title>
+>
+> In this tutorial, we will cover:
+>
+> 1. TOC
+> {:toc}
+>
+{: .agenda}
+
+# Title for your first section
+
+Give some background about what the trainees will be doing in the section.
+Remember that many people reading your materials will likely be novices,
+so make sure to explain all the relevant concepts.
+
+## Title for a subsection
+Section and subsection titles will be displayed in the tutorial index on the left side of
+the page, so try to make them informative and concise!
+
+# Hands-on Sections
+Below are a series of hand-on boxes, one for each tool in your workflow file.
+Often you may wish to combine several boxes into one or make other adjustments such
+as breaking the tutorial into sections, we encourage you to make such changes as you
+see fit, this is just a starting point :)
+
+Anywhere you find the word "***TODO***", there is something that needs to be changed
+depending on the specifics of your tutorial.
+
+have fun!
+
+## Get data
+
+> <hands-on-title> Data Upload </hands-on-title>
+>
+> 1. Create a new history for this tutorial
+> 2. Import the files from [Zenodo]({{ page.zenodo_link }}) or from
+>    the shared data library (`GTN - Material` -> `{{ page.topic_name }}`
+>     -> `{{ page.title }}`):
+>
+>    ```
+>    https://zenodo.org/api/records/10405036/files/SRR15462516.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462517.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462518.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462519.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462520.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462521.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462522.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462523.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462524.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462525.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462526.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462527.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462528.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462529.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR15462530.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681520.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681521.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681522.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681523.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681524.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681525.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681526.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681527.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681528.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681529.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681530.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681531.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681532.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681533.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681534.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681535.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681536.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681537.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681538.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681539.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681540.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681541.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681542.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681543.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681544.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681545.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681546.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681547.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681548.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681549.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681550.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681551.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681552.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681553.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681554.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681555.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681556.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681557.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681558.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681559.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681560.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681561.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681562.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681563.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681564.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681565.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/SRR16681566.featureCounts.tabular/content
+>    https://zenodo.org/api/records/10405036/files/factordata.tabular/content
+>    https://zenodo.org/api/records/10405036/files/gene_lengths.tabular/content
+>    ```
+>    ***TODO***: *Add the files by the ones on Zenodo here (if not added)*
+>
+>    ***TODO***: *Remove the useless files (if added)*
+>
+>    {% snippet faqs/galaxy/datasets_import_via_link.md %}
+>
+>    {% snippet faqs/galaxy/datasets_import_from_data_library.md %}
+>
+> 3. Rename the datasets
+> 4. Check that the datatype
+>
+>    {% snippet faqs/galaxy/datasets_change_datatype.md datatype="datatypes" %}
+>
+> 5. Add to each database a tag corresponding to ...
+>
+>    {% snippet faqs/galaxy/datasets_add_tag.md %}
+>
+{: .hands_on}
+
+# Title of the section usually corresponding to a big step in the analysis
+
+It comes first a description of the step: some background and some theory.
+Some image can be added there to support the theory explanation:
+
+![Alternative text](../../images/image_name "Legend of the image")
+
+The idea is to keep the theory description before quite simple to focus more on the practical part.
+
+***TODO***: *Consider adding a detail box to expand the theory*
+
+> <details-title> More details about the theory </details-title>
+>
+> But to describe more details, it is possible to use the detail boxes which are expandable
+>
+{: .details}
+
+A big step can have several subsections or sub steps:
+
+
+## Sub-step with **GC Skew**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [GC Skew](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_gc_skew/0.69.8+galaxy9) %} with the following parameters:
+>    - *"Source for reference genome"*: `Use a genome from history`
+>        - {% icon param-file %} *"Select a reference genome"*: `output` (Input dataset)
+>    - *"Window size"*: `200`
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: Interval to Circos Text Labels**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: Interval to Circos Text Labels](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_interval_to_text/0.69.8+galaxy9) %} with the following parameters:
+>    - *"Data Format"*: `GFF3`
+>        - {% icon param-file %} *"GFF3 File"*: `output` (Input dataset)
+>        - *"GFF3 Attribute to pull value from"*: `Name`
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **GFF-to-BED**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [GFF-to-BED](gff2bed1) %} with the following parameters:
+>    - {% icon param-file %} *"Convert this dataset"*: `output` (Input dataset)
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: bigWig to Scatter**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: bigWig to Scatter](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_wiggle_to_scatter/0.69.8+galaxy9) %} with the following parameters:
+>    - {% icon param-file %} *"Data file"*: `output` (Input dataset)
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: bigWig to Scatter**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: bigWig to Scatter](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_wiggle_to_scatter/0.69.8+galaxy9) %} with the following parameters:
+>    - {% icon param-file %} *"Data file"*: `output` (Input dataset)
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: bigWig to Scatter**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: bigWig to Scatter](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_wiggle_to_scatter/0.69.8+galaxy9) %} with the following parameters:
+>    - {% icon param-file %} *"Data file"*: `output` (Input dataset)
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Cut**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Cut](Cut1) %} with the following parameters:
+>    - *"Cut columns"*: `c1,c2,c2,c6`
+>    - {% icon param-file %} *"From"*: `output` (Input dataset)
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: bigWig to Scatter**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: bigWig to Scatter](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_wiggle_to_scatter/0.69.8+galaxy9) %} with the following parameters:
+>    - {% icon param-file %} *"Data file"*: `output` (output of **GC Skew** {% icon tool %})
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos: Interval to Tiles**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos: Interval to Tiles](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos_interval_to_tile/0.69.8+galaxy9) %} with the following parameters:
+>    - *"Data Format"*: `BED6+`
+>        - {% icon param-file %} *"BED File (BED6+ only)"*: `out_file1` (output of **GFF-to-BED** {% icon tool %})
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+## Sub-step with **Circos**
+
+> <hands-on-title> Task description </hands-on-title>
+>
+> 1. {% tool [Circos](toolshed.g2.bx.psu.edu/repos/iuc/circos/circos/0.69.8+galaxy9) %} with the following parameters:
+>    - In *"Karyotype"*:
+>        - *"Reference Genome Source"*: ` FASTA File from History (can be slow, generate a length file to improve execution time.)`
+>            - {% icon param-file %} *"Source FASTA Sequence"*: `output` (Input dataset)
+>    - In *"Ideogram"*:
+>        - *"Chromosome units"*: `Kilobases`
+>        - *"Spacing Between Ideograms (in chromosome units)"*: `0.3`
+>        - *"Thickness"*: `10.0`
+>        - In *"Labels"*:
+>            - *"Label Font Size"*: `48`
+>    - In *"General"*:
+>        - *"Plot Background"*: `Solid Color`
+>    - In *"2D Data Tracks"*:
+>        - In *"2D Data Plot"*:
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.98`
+>                - *"Inside Radius"*: `0.92`
+>                - *"Plot Type"*: `Stacked Histogram`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Stroke Color Transparency"*: `0.4`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.79`
+>                - *"Inside Radius"*: `0.6`
+>                - *"Z-index"*: `10`
+>                - *"Plot Type"*: `Scatter`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Glyph"*: `Triangle`
+>                        - *"Glyph Size"*: `6`
+>                        - *"Fill Color"*: `#dc8add`
+>                        - *"Stroke Thickness"*: `0`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>                - In *"Axes"*:
+>                    - In *"Axis"*:
+>                        - {% icon param-repeat %} *"Insert Axis"*
+>                            - *"Radial Position"*: `Absolute position (values match data values)`
+>                                - *"Spacing"*: `1000.0`
+>                            - *"y1"*: `5000.0`
+>                            - *"Color"*: `#1a5fb4`
+>                            - *"Color Transparency"*: `0.4`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.92`
+>                - *"Inside Radius"*: `0.86`
+>                - *"Plot Type"*: `Histogram`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Fill Color"*: `#8ff0a4`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.86`
+>                - *"Plot Type"*: `Histogram`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Fill Color"*: `#ffbe6f`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.6`
+>                - *"Inside Radius"*: `0.55`
+>                - *"Plot Type"*: `Text Labels`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Label Size"*: `18`
+>                        - *"Show Link"*: `No`
+>                        - *"Snuggle Labels"*: `Yes`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>                - In *"Rules"*:
+>                    - In *"Rule"*:
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Based on qualifier value (when available)`
+>                                        - *"Qualifier name"*: `strand`
+>                                        - *"Condition"*: `Less than (numeric)`
+>                                        - *"Qualifier value to compare against"*: `0`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Stroke Color`
+>                                        - *"Stroke Color"*: `#1a5fb4`
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Based on qualifier value (when available)`
+>                                        - *"Qualifier name"*: `strand`
+>                                        - *"Condition"*: `Greater than (numeric)`
+>                                        - *"Qualifier value to compare against"*: `0`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Stroke Color`
+>                                        - *"Stroke Color"*: `#ffdcfc`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.7`
+>                - *"Inside Radius"*: `0.6`
+>                - *"Plot Type"*: `Tiles`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Fill Color"*: `#1c71d8`
+>                        - *"Overflow Behavior"*: `Hide: overflow tiles are not drawn`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>                - In *"Rules"*:
+>                    - In *"Rule"*:
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Based on qualifier value (when available)`
+>                                        - *"Qualifier name"*: `strand`
+>                                        - *"Condition"*: `Less than (numeric)`
+>                                        - *"Qualifier value to compare against"*: `0`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Visibility`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.53`
+>                - *"Inside Radius"*: `0.45`
+>                - *"Plot Type"*: `Tiles`
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Overflow Behavior"*: `Hide: overflow tiles are not drawn`
+>                - *"Orient Inwards"*: `Yes`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>                - In *"Rules"*:
+>                    - In *"Rule"*:
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Based on qualifier value (when available)`
+>                                        - *"Qualifier name"*: `strand`
+>                                        - *"Condition"*: `Greater than (numeric)`
+>                                        - *"Qualifier value to compare against"*: `0`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Visibility`
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Apply to Every Point`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Fill Color for all points`
+>                                        - *"Fill Color"*: `#99c1f1`
+>            - {% icon param-repeat %} *"Insert 2D Data Plot"*
+>                - *"Outside Radius"*: `0.45`
+>                - *"Inside Radius"*: `0.35`
+>                - *"Plot Type"*: `Histogram`
+>                    - {% icon param-file %} *"Histogram Data Source"*: `output` (output of **Circos: bigWig to Scatter** {% icon tool %})
+>                    - In *"Plot Format Specific Options"*:
+>                        - *"Fill Color"*: `#ff5757`
+>                - *"Minimum / maximum options"*: `Plot all values`
+>                - In *"Rules"*:
+>                    - In *"Rule"*:
+>                        - {% icon param-repeat %} *"Insert Rule"*
+>                            - In *"Conditions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Conditions to Apply"*
+>                                    - *"Condition"*: `Based on value (ONLY for scatter/histogram/heatmap/line)`
+>                                        - *"Points below this value"*: `0.0`
+>                            - In *"Actions to Apply"*:
+>                                - {% icon param-repeat %} *"Insert Actions to Apply"*
+>                                    - *"Action"*: `Change Fill Color for all points`
+>                                        - *"Fill Color"*: `#5092f7`
+>    - In *"Ticks"*:
+>        - *"Skip first label"*: `Yes`
+>        - In *"Tick Group"*:
+>            - {% icon param-repeat %} *"Insert Tick Group"*
+>                - *"Tick Spacing"*: `10.0`
+>                - *"Tick Size"*: `20.0`
+>                - *"Show Tick Labels"*: `Yes`
+>            - {% icon param-repeat %} *"Insert Tick Group"*
+>                - *"Tick Size"*: `15.0`
+>                - *"Show Tick Labels"*: `No`
+>            - {% icon param-repeat %} *"Insert Tick Group"*
+>                - *"Tick Spacing"*: `0.25`
+>                - *"Color"*: `#9a9996`
+>                - *"Show Tick Labels"*: `No`
+>
+>    ***TODO***: *Check parameter descriptions*
+>
+>    ***TODO***: *Consider adding a comment or tip box*
+>
+>    > <comment-title> short description </comment-title>
+>    >
+>    > A comment about the tool or something else. This box can also be in the main text
+>    {: .comment}
+>
+{: .hands_on}
+
+***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
+
+> <question-title></question-title>
+>
+> 1. Question1?
+> 2. Question2?
+>
+> > <solution-title></solution-title>
+> >
+> > 1. Answer for question1
+> > 2. Answer for question2
+> >
+> {: .solution}
+>
+{: .question}
+
+
+## Re-arrange
+
+To create the template, each step of the workflow had its own subsection.
+
+***TODO***: *Re-arrange the generated subsections into sections or other subsections.
+Consider merging some hands-on boxes to have a meaningful flow of the analyses*
+
+# Conclusion
+
+Sum up the tutorial and the key takeaways here. We encourage adding an overview image of the
+pipeline used.

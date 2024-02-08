@@ -253,16 +253,15 @@ function get_input_tool_name(step_id, steps){
 }
 
 class ToolInput {
-	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id, optional_enable_log) {
-		if(source === 'y' && optional_tool_id.indexOf('multiqc') > -1){
+	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
+		if(source === 'y' && optional_tool_id.indexOf('Grep1') > -1){
 			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
 				// 'wf_param_values', wf_param_values, 
 				level, should_be_there, force_default, source)
-			this.optional_enable_log = 1;
+			this.optional_enable_log = true;
 		}
 		this.optional_tool_id = optional_tool_id
 
-		// conso
 		this.name = tool_inp_desc.name
 		if (tool_inp_desc.type === undefined){
 			throw new Error(`No type for the parameter ${tool_inp_desc.name}`)
@@ -276,12 +275,12 @@ class ToolInput {
 		this.should_be_there = should_be_there || false
 		this.force_default = force_default || false
 
-		// console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
+		this.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
 		if(this.wf_param_values[this.name] === undefined) {
 			if (this.should_be_there, should_be_there) {
-				throw new Error(`Parameter ${this.name} not in wf_param_values`)
+				throw new Error(`Parameter ${this.name} not in wf_param_values (${optional_tool_id}, ${JSON.stringify(wf_param_values)})`)
 			} else {
-				console.log(`Parameter ${this.name} not in workflow`)
+				this.log(`Parameter ${this.name} not in workflow`)
 				throw new Error(`Parameter ${this.name} not in wf_param_values`)
 			}
 		} else {
@@ -289,12 +288,18 @@ class ToolInput {
 		}
 	}
 
+	log(msg){
+		if(this.optional_enable_log !== undefined){
+			console.log(" ".repeat(this.level), msg)
+		}
+	}
+
 	get_formatted_inputs() {
-		console.log('gfi');
+		this.log('gfi');
 		let inputlist = ""
 		let inps = []
 		let icon;
-		console.log('this.wf_param_values', this.wf_param_values)
+		this.log('this.wf_param_values', this.wf_param_values)
 		if (Array.isArray(this.wf_param_values)) {
 			icon = "param-files"
 			for (let i in this.wf_param_values){
@@ -341,11 +346,11 @@ class ToolInput {
 			let param_values = []
 			for (let option_idx in this.tool_inp_desc.options){
 				let option = this.tool_inp_desc.options[option_idx]
-				console.log('option', option, this.wf_param_values)
+				this.log('option', option, this.wf_param_values)
 				// BEGIN DIFF vs original
 				if(Array.isArray(this.wf_param_values)){
 					if(this.wf_param_values.indexOf(option[1]) > -1){
-						// console.log(`TAKING ${option[0]}`)
+						this.log(`TAKING ${option[0]}`)
 						param_values.push(option[0])
 					}
 				} else {
@@ -375,7 +380,7 @@ class ToolInput {
 	}
 
 	get_formatted_conditional_desc(){
-		// console.log('gfcd');
+		this.log('gfcd');
 		let conditional_paramlist = ""
 		let inpp = new ToolInput(
 			this.tool_inp_desc.test_param,
@@ -386,7 +391,6 @@ class ToolInput {
 			true,
 			'z',
 			this.optional_tool_id,
-			this.optional_enable_log,
 		)
 		conditional_paramlist += inpp.get_formatted_desc()
 		let cond_param = inpp.wf_param_values
@@ -417,19 +421,18 @@ class ToolInput {
 					this.level + 1,
 					false, false, 'x',
 					this.optional_tool_id,
-					this.optional_enable_log,
 				)
 				sub_param_desc += tool_inp.get_formatted_desc()
 			} catch (e) {
 				// This is a difference from planemo, there the error somehow just results in an empty parameter?
-				// console.log('error', e)
+				this.log('error', e)
 			}
 		}
 		return sub_param_desc
 	}
 
 	get_formatted_repeat_desc(){
-		// console.log('gfrd');
+		this.log('gfrd');
 		let repeat_paramlist = "";
 		if (this.wf_param_values != "[]"){
 			// let tool_inp = {}
@@ -442,11 +445,11 @@ class ToolInput {
 			let cur_level = this.level
 			for (let param_idx in tmp_wf_param_values) {
 				let param = tmp_wf_param_values[param_idx]
-				// console.log('param_idx', param_idx, param)
+				this.log('param_idx', param_idx, param)
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
-				// console.log('paramlist_in_repeat', paramlist_in_repeat)
+				this.log('paramlist_in_repeat', paramlist_in_repeat)
 
 				if(paramlist_in_repeat !== ""){
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
@@ -471,7 +474,7 @@ class ToolInput {
 	}
 
 	get_formatted_section_desc(){
-		// console.log('gfsd');
+		this.log('gfsd');
 		let section_paramlist = "";
 		let sub_param_desc = this.get_lower_param_desc();
 		if(sub_param_desc != ""){
@@ -597,13 +600,14 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	let paramlist = "";
 	console.log(`# Tool ${wf_step.tool_id}`);
 	for (let inp of tool_desc.inputs) {
+		// console.log("\t", inp);
 		if (! inp.name.startsWith("__")) {
 			let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
 			paramlist += tool_inp.get_formatted_desc();
 		}
 	}
 	if (wf_step.tool_id.indexOf("multiqc") !== -1) {
-		sysexit();
+		// sysexit();
 	}
 	return render_template(
 		HANDS_ON_TOOL_BOX_TEMPLATE,
@@ -615,7 +619,7 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	);
 }
 
-function process_workflow(data) {
+function process_workflow(data, wf_id) {
 	let steps = Object.keys(data.steps)
 		.map(step_id => {
 			return [step_id, data.steps[step_id]];
@@ -624,11 +628,13 @@ function process_workflow(data) {
 	// Collect tool information
 	let tool_desc_query = steps
 		.map((step) => {
-			return step[1].tool_id;
+			return step[1];
 		})
-		.filter(value => { return value !== undefined; })
-		.map(tool_id => {
-			return fetch(`https://usegalaxy.eu/api/tools/${tool_id}?io_details=True&link_details=False`)
+		.filter(value => { return value.tool_id !== undefined; })
+		.map(tool => {
+			// Difference from PTDK/planemo: we supply the tool version *additionally* in the URL parameter
+			// This is a workaround *specifically* for tools like Grep1 which changed top level default params between 1.0.1 and 1.0.4
+			return fetch(`https://usegalaxy.eu/api/tools/${tool.tool_id}?io_details=True&link_details=False&tool_version=${tool.tool_version}`)
 				.then(response => response.json())
 		});
 
@@ -684,7 +690,7 @@ function process_workflow(data) {
 					zenodo_link: zenodo_link,
 				});
 
-				fs.writeFile('hands_on_workflow.html', final_tuto, (err) => {
+				fs.writeFile(`ptdk-js-${wf_id}.html`, final_tuto, (err) => {
 					if (err) throw err;
 					console.log('The file has been saved!');
 				})
@@ -695,25 +701,27 @@ function process_workflow(data) {
 	});
 }
 
-const wf1 = `17352c36a0011c6a`
-const wf2 = `e1119904debfd22c`
+const wfs = [
+	// '17352c36a0011c6a',
+	// 'e1119904debfd22c',
+	// '8ca9a936aa3d06af',
+	'4ddbffe4b3fef275',
+]
 
-// read the workflow from the JSON file
-fetch(`https://usegalaxy.eu/api/workflows/${wf2}/download?format=json-download`)
-	.then(response => response.json())
-	.then(data => {
-		// {
-		// 	err_msg: 'Workflow is not owned by or shared with current user',
-		// 	err_code: 403002
-		// }
-		if (data.err_code) {
-			console.error(data.err_msg);
-			return;
-		}
-		return data
-	})
-	.then(data => process_workflow(data));
-
-
-
-
+wfs.forEach(wf_id => {
+	// read the workflow from the JSON file
+	fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
+		.then(response => response.json())
+		.then(data => {
+			// {
+			// 	err_msg: 'Workflow is not owned by or shared with current user',
+			// 	err_code: 403002
+			// }
+			if (data.err_code) {
+				console.error(data.err_msg);
+				return;
+			}
+			return data
+		})
+		.then(data => process_workflow(data, wf_id));
+});
