@@ -153,8 +153,7 @@ Consider merging some hands-on boxes to have a meaningful flow of the analyses*
 # Conclusion
 
 Sum up the tutorial and the key takeaways here. We encourage adding an overview image of the
-pipeline used.
-`
+pipeline used.`
 
 
 const TUTO_HAND_ON_TEMPLATE = `---
@@ -254,13 +253,14 @@ function get_input_tool_name(step_id, steps){
 }
 
 class ToolInput {
-	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(source === 'y' && optional_tool_id.indexOf('limma') > -1){
-			console.log(`ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
+	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id, optional_enable_log) {
+		if(source === 'y' && optional_tool_id.indexOf('multiqc') > -1){
+			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
 				// 'wf_param_values', wf_param_values, 
 				level, should_be_there, force_default, source)
-			this.enable_log = true;
+			this.optional_enable_log = 1;
 		}
+		this.optional_tool_id = optional_tool_id
 
 		// conso
 		this.name = tool_inp_desc.name
@@ -276,9 +276,7 @@ class ToolInput {
 		this.should_be_there = should_be_there || false
 		this.force_default = force_default || false
 
-		if(this.name == "output_cols" || this.name == "id_type") {
-			console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
-		}
+		// console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
 		if(this.wf_param_values[this.name] === undefined) {
 			if (this.should_be_there, should_be_there) {
 				throw new Error(`Parameter ${this.name} not in wf_param_values`)
@@ -296,6 +294,7 @@ class ToolInput {
 		let inputlist = ""
 		let inps = []
 		let icon;
+		console.log('this.wf_param_values', this.wf_param_values)
 		if (Array.isArray(this.wf_param_values)) {
 			icon = "param-files"
 			for (let i in this.wf_param_values){
@@ -303,6 +302,7 @@ class ToolInput {
 			}
 		} else {
 			let inp = this.wf_param_values
+
 			if (inp.id !== undefined){
 				// Single input or collection
 				let inp_type = this.wf_steps[inp.id].type
@@ -329,6 +329,7 @@ class ToolInput {
 	get_formatted_other_param_desc(){
 		let param_value;
 		if (this.tool_inp_desc.value == this.wf_param_values && !this.force_default){
+			return "";
 			// nothing
 		} else if (this.type == "boolean") {
 			if(to_bool(this.tool_inp_desc.value) === this.wf_param_values){
@@ -340,7 +341,7 @@ class ToolInput {
 			let param_values = []
 			for (let option_idx in this.tool_inp_desc.options){
 				let option = this.tool_inp_desc.options[option_idx]
-				// console.log('option', option, this.wf_param_values)
+				console.log('option', option, this.wf_param_values)
 				// BEGIN DIFF vs original
 				if(Array.isArray(this.wf_param_values)){
 					if(this.wf_param_values.indexOf(option[1]) > -1){
@@ -350,6 +351,7 @@ class ToolInput {
 				} else {
 					if (option[1] == this.wf_param_values){
 						param_values.push(option[0])
+						break;
 					}
 				}
 				// END DIFF
@@ -382,7 +384,9 @@ class ToolInput {
 			this.level,
 			true,
 			true,
-			'z'
+			'z',
+			this.optional_tool_id,
+			this.optional_enable_log,
 		)
 		conditional_paramlist += inpp.get_formatted_desc()
 		let cond_param = inpp.wf_param_values
@@ -411,18 +415,21 @@ class ToolInput {
 					this.wf_param_values,
 					this.wf_steps,
 					this.level + 1,
-					false, false, 'x')
+					false, false, 'x',
+					this.optional_tool_id,
+					this.optional_enable_log,
+				)
 				sub_param_desc += tool_inp.get_formatted_desc()
 			} catch (e) {
 				// This is a difference from planemo, there the error somehow just results in an empty parameter?
-				console.log('error', e)
+				// console.log('error', e)
 			}
 		}
 		return sub_param_desc
 	}
 
 	get_formatted_repeat_desc(){
-		console.log('gfrd');
+		// console.log('gfrd');
 		let repeat_paramlist = "";
 		if (this.wf_param_values != "[]"){
 			// let tool_inp = {}
@@ -435,11 +442,11 @@ class ToolInput {
 			let cur_level = this.level
 			for (let param_idx in tmp_wf_param_values) {
 				let param = tmp_wf_param_values[param_idx]
-				console.log('param_idx', param_idx, param)
+				// console.log('param_idx', param_idx, param)
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
-				console.log('paramlist_in_repeat', paramlist_in_repeat)
+				// console.log('paramlist_in_repeat', paramlist_in_repeat)
 
 				if(paramlist_in_repeat !== ""){
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
@@ -595,6 +602,9 @@ function process_wf_step(wf_step, tool_descs, steps) {
 			paramlist += tool_inp.get_formatted_desc();
 		}
 	}
+	if (wf_step.tool_id.indexOf("multiqc") !== -1) {
+		sysexit();
+	}
 	return render_template(
 		HANDS_ON_TOOL_BOX_TEMPLATE,
 		{
@@ -689,7 +699,7 @@ const wf1 = `17352c36a0011c6a`
 const wf2 = `e1119904debfd22c`
 
 // read the workflow from the JSON file
-fetch(`https://usegalaxy.eu/api/workflows/${wf1}/download?format=json-download`)
+fetch(`https://usegalaxy.eu/api/workflows/${wf2}/download?format=json-download`)
 	.then(response => response.json())
 	.then(data => {
 		// {

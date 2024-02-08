@@ -199,13 +199,12 @@ The idea is to keep the theory description before quite simple to focus more on 
 A big step can have several subsections or sub steps:
 
 
-## Sub-step with **Column join**
+## Sub-step with **Extract element identifiers**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Column join](toolshed.g2.bx.psu.edu/repos/iuc/collection_column_join/collection_column_join/0.0.3) %} with the following parameters:
->    - {% icon param-collection %} *"Tabular files"*: `output` (Input dataset collection)
->    - *"Number of header lines in each input file"*: `1`
+> 1. {% tool [Extract element identifiers](toolshed.g2.bx.psu.edu/repos/iuc/collection_element_identifiers/collection_element_identifiers/0.0.2) %} with the following parameters:
+>    - {% icon param-collection %} *"Dataset collection"*: `output` (Input dataset collection)
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -234,13 +233,30 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Extract dataset**
+## Sub-step with **Cutadapt**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:
->    - {% icon param-collection %} *"Input List"*: `output` (Input dataset collection)
->    - *"How should a dataset be selected?"*: `The first dataset`
+> 1. {% tool [Cutadapt](toolshed.g2.bx.psu.edu/repos/lparsons/cutadapt/cutadapt/4.4+galaxy0) %} with the following parameters:
+>    - *"Single-end or Paired-end reads?"*: `Single-end`
+>        - {% icon param-collection %} *"FASTQ/A file"*: `output` (Input dataset collection)
+>        - In *"Read 1 Options"*:
+>            - In *"3' (End) Adapters"*:
+>                - {% icon param-repeat %} *"Insert 3' (End) Adapters"*
+>                    - *"Source"*: `Enter custom sequence`
+>                        - *"Enter custom 3' adapter name (Optional if Multiple output is 'No')"*: `Nextera`
+>                        - *"Enter custom 3' adapter sequence"*: `CTGTCTCTTATA`
+>                - {% icon param-repeat %} *"Insert 3' (End) Adapters"*
+>                    - *"Source"*: `Enter custom sequence`
+>                        - *"Enter custom 3' adapter name (Optional if Multiple output is 'No')"*: `TruSeq`
+>                        - *"Enter custom 3' adapter sequence"*: `AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC`
+>    - In *"Filter Options"*:
+>        - *"Minimum length (R1)"*: `20`
+>        - *"Specify a minimum/maximum length for reverse reads (R2)"*: `Disabled`
+>    - In *"Read Modification Options"*:
+>        - *"Quality cutoff"*: `20`
+>        - *"Shortening reads to a fixed length"*: `Disabled`
+>    - *"Outputs selector"*: `Report: Cutadapt's per-adapter statistics. You can use this file with MultiQC.`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -269,16 +285,16 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Sort**
+## Sub-step with **Regex Find And Replace**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Sort](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sort_header_tool/1.1.1) %} with the following parameters:
->    - {% icon param-file %} *"Sort Query"*: `tabular_output` (output of **Column join** {% icon tool %})
->    - In *"Column selections"*:
->        - {% icon param-repeat %} *"Insert Column selections"*
->            - *"on column"*: `c1`
->            - *"in"*: `Descending order`
+> 1. {% tool [Regex Find And Replace](toolshed.g2.bx.psu.edu/repos/galaxyp/regex_find_replace/regex1/1.0.3) %} with the following parameters:
+>    - {% icon param-file %} *"Select lines from"*: `output` (output of **Extract element identifiers** {% icon tool %})
+>    - In *"Check"*:
+>        - {% icon param-repeat %} *"Insert Check"*
+>            - *"Find Regex"*: `$`
+>            - *"Replacement"*: `_pre`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -307,15 +323,12 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **annotateMyIDs**
+## Sub-step with **FastQC**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [annotateMyIDs](toolshed.g2.bx.psu.edu/repos/iuc/annotatemyids/annotatemyids/3.16.0+galaxy1) %} with the following parameters:
->    - {% icon param-file %} *"File with IDs"*: `tabular_output` (output of **Column join** {% icon tool %})
->    - *"File has header?"*: `Yes`
->    - *"ID Type"*: `Entrez`
->    - *"Output columns"*: `ENTREZID, SYMBOL, GENENAME`
+> 1. {% tool [FastQC](toolshed.g2.bx.psu.edu/repos/devteam/fastqc/fastqc/0.74+galaxy0) %} with the following parameters:
+>    - {% icon param-file %} *"Raw read data from your current history"*: `out1` (output of **Cutadapt** {% icon tool %})
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -344,15 +357,28 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Replace Text**
+## Sub-step with **HISAT2**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Replace Text](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_replace_in_line/1.1.2) %} with the following parameters:
->    - {% icon param-file %} *"File to process"*: `outfile` (output of **Sort** {% icon tool %})
->    - In *"Replacement"*:
->        - {% icon param-repeat %} *"Insert Replacement"*
->            - *"Find pattern"*: ` uncompressed.fastqsanger`
+> 1. {% tool [HISAT2](toolshed.g2.bx.psu.edu/repos/iuc/hisat2/hisat2/2.2.1+galaxy1) %} with the following parameters:
+>    - *"Source for the reference genome"*: `Use a built-in genome`
+>        - *"Select a reference genome"*: `Human (Homo sapiens): hg19 Full`
+>    - *"Is this a single or paired library"*: `Single-end`
+>        - {% icon param-file %} *"FASTA/Q file"*: `out1` (output of **Cutadapt** {% icon tool %})
+>        - *"Specify strand information"*: `Forward (F)`
+>    - In *"Summary Options"*:
+>        - *"Output alignment summary in a more machine-friendly style."*: `Yes`
+>        - *"Print alignment summary to a file."*: `Yes`
+>    - In *"Advanced Options"*:
+>        - *"Input options"*: `Use default values`
+>        - *"Alignment options"*: `Use default values`
+>        - *"Scoring options"*: `Use default values`
+>        - *"Spliced alignment options"*: `Use default values`
+>        - *"Reporting options"*: `Use default values`
+>        - *"Output options"*: `Use default values`
+>        - *"SAM options"*: `Use default values`
+>        - *"Other options"*: `Use default values`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -381,27 +407,13 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **limma**
+## Sub-step with **Relabel identifiers**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [limma](toolshed.g2.bx.psu.edu/repos/iuc/limma_voom/limma_voom/3.50.1+galaxy0) %} with the following parameters:
->    - *"Differential Expression Method"*: `limma-voom`
->    - *"Count Files or Matrix?"*: `Single Count Matrix`
->        - {% icon param-file %} *"Count Matrix"*: `outfile` (output of **Replace Text** {% icon tool %})
->        - *"Input factor information from file?"*: `Yes`
->            - {% icon param-file %} *"Factor File"*: `output` (Input dataset)
->    - *"Use Gene Annotations?"*: `Yes`
->        - {% icon param-file %} *"Gene Annotations"*: `out_tab` (output of **annotateMyIDs** {% icon tool %})
->    - *"Input Contrast information from file?"*: `No`
->        - In *"Contrast"*:
->            - {% icon param-repeat %} *"Insert Contrast"*
->                - *"Contrast of Interest"*: `COVID-healthy`
->    - In *"Filter Low Counts"*:
->        - *"Filter lowly expressed genes?"*: `Yes`
->            - *"Filter on CPM or Count values?"*: `CPM`
->                - *"Minimum CPM"*: `0.5`
->                - *"Minimum Samples"*: `1`
+> 1. {% tool [Relabel identifiers](__RELABEL_FROM_FILE__) %} with the following parameters:
+>    - *"How should the new labels be specified?"*: `Using lines in a simple text file.`
+>        - {% icon param-file %} *"New Identifiers"*: `out_file1` (output of **Regex Find And Replace** {% icon tool %})
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -430,13 +442,18 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Extract dataset**
+## Sub-step with **featureCounts**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Extract dataset](__EXTRACT_DATASET__) %} with the following parameters:
->    - {% icon param-file %} *"Input List"*: `outTables` (output of **limma** {% icon tool %})
->    - *"How should a dataset be selected?"*: `The first dataset`
+> 1. {% tool [featureCounts](toolshed.g2.bx.psu.edu/repos/iuc/featurecounts/featurecounts/2.0.3+galaxy1) %} with the following parameters:
+>    - {% icon param-file %} *"Alignment file"*: `output_alignments` (output of **HISAT2** {% icon tool %})
+>    - *"Specify strand information"*: `Stranded (Forward)`
+>    - *"Gene annotation file"*: `featureCounts built-in`
+>    - *"Create gene-length file"*: `Yes`
+>    - *"Does the input have read pairs?"*: `No, single-end.`
+>    - In *"Advanced options"*:
+>        - *"Allow reads to map to multiple features"*: `Enabled: both multi-mapping and multi-overlapping features are included (-M -O)`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -465,13 +482,13 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Cut**
+## Sub-step with **Read Distribution**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:
->    - *"Cut columns"*: `c2,c4,c7,c8`
->    - {% icon param-file %} *"From"*: `output` (output of **Extract dataset** {% icon tool %})
+> 1. {% tool [Read Distribution](toolshed.g2.bx.psu.edu/repos/nilesh/rseqc/rseqc_read_distribution/5.0.1+galaxy2) %} with the following parameters:
+>    - {% icon param-file %} *"Input BAM/SAM file"*: `output_alignments` (output of **HISAT2** {% icon tool %})
+>    - {% icon param-file %} *"Reference gene model"*: `output` (Input dataset)
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -500,16 +517,14 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Join two Datasets**
+## Sub-step with **Gene Body Coverage (BAM)**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Join two Datasets](join1) %} with the following parameters:
->    - {% icon param-file %} *"Join"*: `output` (output of **Extract dataset** {% icon tool %})
->    - *"using column"*: `c1`
->    - {% icon param-file %} *"with"*: `output` (output of **Extract dataset** {% icon tool %})
->    - *"and column"*: `c1`
->    - *"Fill empty columns"*: `No`
+> 1. {% tool [Gene Body Coverage (BAM)](toolshed.g2.bx.psu.edu/repos/nilesh/rseqc/rseqc_geneBody_coverage/5.0.1+galaxy2) %} with the following parameters:
+>    - *"Run each sample separately, or combine mutiple samples into one plot"*: `Run each sample separately`
+>        - {% icon param-file %} *"Input .bam file"*: `output_alignments` (output of **HISAT2** {% icon tool %})
+>    - {% icon param-file %} *"Reference gene model"*: `output` (Input dataset)
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -538,14 +553,12 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Compute**
+## Sub-step with **FastQC**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Compute](toolshed.g2.bx.psu.edu/repos/devteam/column_maker/Add_a_column1/1.4) %} with the following parameters:
->    - *"Add expression"*: `c8<0.05`
->    - {% icon param-file %} *"as a new column to"*: `out_file1` (output of **Join two Datasets** {% icon tool %})
->    - *"Skip a header line"*: `no`
+> 1. {% tool [FastQC](toolshed.g2.bx.psu.edu/repos/devteam/fastqc/fastqc/0.74+galaxy0) %} with the following parameters:
+>    - {% icon param-file %} *"Raw read data from your current history"*: `output` (output of **Relabel identifiers** {% icon tool %})
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -574,160 +587,34 @@ A big step can have several subsections or sub steps:
 >
 {: .question}
 
-## Sub-step with **Cut**
+## Sub-step with **MultiQC**
 
 > <hands-on-title> Task description </hands-on-title>
 >
-> 1. {% tool [Cut](Cut1) %} with the following parameters:
->    - *"Cut columns"*: `c1,c11,c12`
->    - {% icon param-file %} *"From"*: `out_file1` (output of **Compute** {% icon tool %})
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **Unique**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Unique](toolshed.g2.bx.psu.edu/repos/bgruening/text_processing/tp_sorted_uniq/1.1.0) %} with the following parameters:
->    - {% icon param-file %} *"File to scan for unique values"*: `out_file1` (output of **Cut** {% icon tool %})
->    - *"Advanced Options"*: `Show Advanced Options`
->        - *"Column start"*: `c1`
->        - *"Column end"*: `c1`
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **Cut**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Cut](Cut1) %} with the following parameters:
->    - *"Cut columns"*: `c1,c3`
->    - {% icon param-file %} *"From"*: `outfile` (output of **Unique** {% icon tool %})
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **Cut**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [Cut](Cut1) %} with the following parameters:
->    - {% icon param-file %} *"From"*: `outfile` (output of **Unique** {% icon tool %})
->
->    ***TODO***: *Check parameter descriptions*
->
->    ***TODO***: *Consider adding a comment or tip box*
->
->    > <comment-title> short description </comment-title>
->    >
->    > A comment about the tool or something else. This box can also be in the main text
->    {: .comment}
->
-{: .hands_on}
-
-***TODO***: *Consider adding a question to test the learners understanding of the previous exercise*
-
-> <question-title></question-title>
->
-> 1. Question1?
-> 2. Question2?
->
-> > <solution-title></solution-title>
-> >
-> > 1. Answer for question1
-> > 2. Answer for question2
-> >
-> {: .solution}
->
-{: .question}
-
-## Sub-step with **goseq**
-
-> <hands-on-title> Task description </hands-on-title>
->
-> 1. {% tool [goseq](toolshed.g2.bx.psu.edu/repos/iuc/goseq/goseq/1.50.0+galaxy0) %} with the following parameters:
->    - {% icon param-file %} *"Differentially expressed genes file"*: `out_file1` (output of **Cut** {% icon tool %})
->    - {% icon param-file %} *"Gene lengths file"*: `out_file1` (output of **Cut** {% icon tool %})
->    - *"Gene categories"*: `Get categories`
->        - *"Select Gene ID format"*: `Entrez Gene ID`
->        - *"Select one or more categories"*: `GO: Cellular Component, GO: Biological Process, GO: Molecular Function, KEGG`
->    - In *"Output Options"*:
->        - *"Output Top GO terms plot?"*: `Yes`
->        - *"Extract the DE genes for the categories (GO/KEGG terms)?"*: `Yes`
+> 1. {% tool [MultiQC](toolshed.g2.bx.psu.edu/repos/iuc/multiqc/multiqc/1.11+galaxy1) %} with the following parameters:
+>    - In *"Results"*:
+>        - {% icon param-repeat %} *"Insert Results"*
+>            - *"Which tool was used generate logs?"*: `FastQC`
+>                - In *"FastQC output"*:
+>                    - {% icon param-repeat %} *"Insert FastQC output"*
+>                        - {% icon param-file %} *"FastQC output"*: `text_file` (output of **FastQC** {% icon tool %})
+>        - {% icon param-repeat %} *"Insert Results"*
+>            - *"Which tool was used generate logs?"*: `Cutadapt/Trim Galore!`
+>                - {% icon param-file %} *"Output of Cutadapt"*: `report` (output of **Cutadapt** {% icon tool %})
+>        - {% icon param-repeat %} *"Insert Results"*
+>            - *"Which tool was used generate logs?"*: `HISAT2`
+>                - {% icon param-file %} *"Output of HISAT2"*: `summary_file` (output of **HISAT2** {% icon tool %})
+>        - {% icon param-repeat %} *"Insert Results"*
+>            - *"Which tool was used generate logs?"*: `RSeQC`
+>                - In *"RSeQC output"*:
+>                    - {% icon param-repeat %} *"Insert RSeQC output"*
+>                        - *"Type of RSeQC output?"*: `Read distribution`
+>                    - {% icon param-repeat %} *"Insert RSeQC output"*
+>                        - *"Type of RSeQC output?"*: `Gene body coverage`
+>                            - {% icon param-file %} *"RSeQC gene body coverage:  stats file"*: `outputtxt` (output of **Gene Body Coverage (BAM)** {% icon tool %})
+>        - {% icon param-repeat %} *"Insert Results"*
+>            - *"Which tool was used generate logs?"*: `featureCounts`
+>                - {% icon param-file %} *"Output of FeatureCounts"*: `output_summary` (output of **featureCounts** {% icon tool %})
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -768,4 +655,3 @@ Consider merging some hands-on boxes to have a meaningful flow of the analyses*
 
 Sum up the tutorial and the key takeaways here. We encourage adding an overview image of the
 pipeline used.
-
