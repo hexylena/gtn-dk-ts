@@ -238,25 +238,6 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [Cutadapt](toolshed.g2.bx.psu.edu/repos/lparsons/cutadapt/cutadapt/4.4+galaxy0) %} with the following parameters:
->    - *"Single-end or Paired-end reads?"*: `Single-end`
->        - {% icon param-collection %} *"FASTQ/A file"*: `output` (Input dataset collection)
->        - In *"Read 1 Options"*:
->            - In *"3' (End) Adapters"*:
->                - {% icon param-repeat %} *"Insert 3' (End) Adapters"*
->                    - *"Source"*: `Enter custom sequence`
->                        - *"Enter custom 3' adapter name (Optional if Multiple output is 'No')"*: `Nextera`
->                        - *"Enter custom 3' adapter sequence"*: `CTGTCTCTTATA`
->                - {% icon param-repeat %} *"Insert 3' (End) Adapters"*
->                    - *"Source"*: `Enter custom sequence`
->                        - *"Enter custom 3' adapter name (Optional if Multiple output is 'No')"*: `TruSeq`
->                        - *"Enter custom 3' adapter sequence"*: `AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC`
->    - In *"Filter Options"*:
->        - *"Minimum length (R1)"*: `20`
->        - *"Specify a minimum/maximum length for reverse reads (R2)"*: `Disabled`
->    - In *"Read Modification Options"*:
->        - *"Quality cutoff"*: `20`
->        - *"Shortening reads to a fixed length"*: `Disabled`
->    - *"Outputs selector"*: `Report: Cutadapt's per-adapter statistics. You can use this file with MultiQC.`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -295,6 +276,9 @@ A big step can have several subsections or sub steps:
 >        - {% icon param-repeat %} *"Insert Check"*
 >            - *"Find Regex"*: `$`
 >            - *"Replacement"*: `_pre`
+>        - {% icon param-repeat %} *"Insert Check"*
+>            - *"Find Regex"*: `2`
+>            - *"Replacement"*: `2`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -447,13 +431,6 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [featureCounts](toolshed.g2.bx.psu.edu/repos/iuc/featurecounts/featurecounts/2.0.3+galaxy1) %} with the following parameters:
->    - {% icon param-file %} *"Alignment file"*: `output_alignments` (output of **HISAT2** {% icon tool %})
->    - *"Specify strand information"*: `Stranded (Forward)`
->    - *"Gene annotation file"*: `featureCounts built-in`
->    - *"Create gene-length file"*: `Yes`
->    - *"Does the input have read pairs?"*: `No, single-end.`
->    - In *"Advanced options"*:
->        - *"Allow reads to map to multiple features"*: `Enabled: both multi-mapping and multi-overlapping features are included (-M -O)`
 >
 >    ***TODO***: *Check parameter descriptions*
 >

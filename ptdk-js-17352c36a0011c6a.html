@@ -279,6 +279,8 @@ A big step can have several subsections or sub steps:
 >        - {% icon param-repeat %} *"Insert Column selections"*
 >            - *"on column"*: `c1`
 >            - *"in"*: `Descending order`
+>        - {% icon param-repeat %} *"Insert Column selections"*
+>            - *"on column"*: `c2`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -312,10 +314,6 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [annotateMyIDs](toolshed.g2.bx.psu.edu/repos/iuc/annotatemyids/annotatemyids/3.16.0+galaxy1) %} with the following parameters:
->    - {% icon param-file %} *"File with IDs"*: `tabular_output` (output of **Column join** {% icon tool %})
->    - *"File has header?"*: `Yes`
->    - *"ID Type"*: `Entrez`
->    - *"Output columns"*: `ENTREZID, SYMBOL, GENENAME`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -353,6 +351,9 @@ A big step can have several subsections or sub steps:
 >    - In *"Replacement"*:
 >        - {% icon param-repeat %} *"Insert Replacement"*
 >            - *"Find pattern"*: ` uncompressed.fastqsanger`
+>        - {% icon param-repeat %} *"Insert Replacement"*
+>            - *"Find pattern"*: `2`
+>            - *"Replace with:"*: `2`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -397,6 +398,8 @@ A big step can have several subsections or sub steps:
 >        - In *"Contrast"*:
 >            - {% icon param-repeat %} *"Insert Contrast"*
 >                - *"Contrast of Interest"*: `COVID-healthy`
+>            - {% icon param-repeat %} *"Insert Contrast"*
+>                - *"Contrast of Interest"*: `3`
 >    - In *"Filter Low Counts"*:
 >        - *"Filter lowly expressed genes?"*: `Yes`
 >            - *"Filter on CPM or Count values?"*: `CPM`

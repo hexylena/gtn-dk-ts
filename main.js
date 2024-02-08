@@ -254,7 +254,7 @@ function get_input_tool_name(step_id, steps){
 
 class ToolInput {
 	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(source === 'y' && optional_tool_id.indexOf('Grep1') > -1){
+		if(source === 'y' && optional_tool_id.indexOf('multiqc') > -1){
 			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
 				// 'wf_param_values', wf_param_values, 
 				level, should_be_there, force_default, source)
@@ -281,16 +281,16 @@ class ToolInput {
 				throw new Error(`Parameter ${this.name} not in wf_param_values (${optional_tool_id}, ${JSON.stringify(wf_param_values)})`)
 			} else {
 				this.log(`Parameter ${this.name} not in workflow`)
-				throw new Error(`Parameter ${this.name} not in wf_param_values`)
+				// throw new Error(`Parameter ${this.name} not in wf_param_values`)
 			}
 		} else {
 			this.wf_param_values = this.wf_param_values[this.name]
 		}
 	}
 
-	log(msg){
+	log(){
 		if(this.optional_enable_log !== undefined){
-			console.log(" ".repeat(this.level), msg)
+			console.log(" ".repeat(this.level), ...arguments)
 		}
 	}
 
@@ -702,10 +702,10 @@ function process_workflow(data, wf_id) {
 }
 
 const wfs = [
-	// '17352c36a0011c6a',
-	// 'e1119904debfd22c',
-	// '8ca9a936aa3d06af',
+	'17352c36a0011c6a',
+	'8ca9a936aa3d06af',
 	'4ddbffe4b3fef275',
+	'e1119904debfd22c',
 ]
 
 wfs.forEach(wf_id => {
