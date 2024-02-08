@@ -160,7 +160,31 @@ pipeline used.
 const TUTO_HAND_ON_TEMPLATE = `---
 layout: tutorial_hands_on
 
-{{ metadata }}
+title: {{ title }}
+zenodo_link: '{{ zenodo_link }}'
+questions:
+- Which biological questions are addressed by the tutorial?
+- Which bioinformatics techniques are important to know for this type of data?
+objectives:
+- The learning objectives are the goals of the tutorial
+- They will be informed by your audience and will communicate to them and to yourself
+  what you should focus on during the course
+- They are single sentences describing what a learner should be able to do once they
+  have completed the tutorial
+- You can use Bloom's Taxonomy to write effective learning objectives
+time_estimation: 3H
+key_points:
+- The take-home messages
+- They will appear at the end of the tutorial
+contributions:
+  authorship:
+  - contributor1
+  editing:
+  - contributor2
+  testing:
+  - contributor3
+  funding:
+  - project-name
 ---
 
 {{ body }}
@@ -604,16 +628,44 @@ function process_workflow(data) {
 			.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
 
 		// write to file
-		zenodo_file_links = [];
 		const fs = require('fs');
-		final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
-			body: bodies,
-			z_file_links: zenodo_file_links.join("\n>    "),
-		});
-		fs.writeFile('hands_on_workflow.html', final_body, (err) => {
-			if (err) throw err;
-			console.log('The file has been saved!');
-		})
+		let zenodo_link = "https://zenodo.org/record/10405036";
+		let z_record;
+		if (zenodo_link.indexOf("doi") > -1) {
+			z_record = zenodo_link.split(".").pop();
+		} else {
+			z_record = zenodo_link.split("/").pop();
+		}
+
+		zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
+
+		fetch(zenodo_link_api)
+			.then(response => response.json())
+			.then(data => {
+				let zenodo_file_links = data.files.map(file => {
+					return {
+						url: file.links.self,
+						src: "url",
+						ext: file.key.split(".").pop() // TODO: map to galaxy
+					}
+				})
+
+				final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
+					body: bodies,
+					z_file_links: zenodo_file_links.map(e => e.url).sort().join("\n>    "),
+				});
+
+				const final_tuto = render_template(TUTO_HAND_ON_TEMPLATE, {
+					body: final_body,
+					title: "My Tutorial Title",
+					zenodo_link: zenodo_link,
+				});
+
+				fs.writeFile('hands_on_workflow.html', final_tuto, (err) => {
+					if (err) throw err;
+					console.log('The file has been saved!');
+				})
+			});
 
 	}).catch(err => {
 		console.error(err);
