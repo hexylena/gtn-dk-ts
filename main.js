@@ -254,11 +254,11 @@ function get_input_tool_name(step_id, steps){
 
 class ToolInput {
 	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(source === 'y' && optional_tool_id.indexOf('multiqc') > -1){
+		if(source === 'y' && optional_tool_id.indexOf('annotate') > -1){
 			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
 				// 'wf_param_values', wf_param_values, 
 				level, should_be_there, force_default, source)
-			this.optional_enable_log = true;
+			this.enable_log = true;
 		}
 		this.optional_tool_id = optional_tool_id
 
@@ -291,7 +291,7 @@ class ToolInput {
 	}
 
 	log(){
-		if(this.optional_enable_log !== undefined){
+		if(this.enable_log !== undefined){
 			console.log(" ".repeat(this.level), ...arguments)
 		}
 	}
@@ -601,15 +601,14 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	tool_desc = tool_descs[wf_step.tool_id] || {"inputs": []};
 	let paramlist = "";
 	console.log(`# Tool ${wf_step.tool_id}`);
+	if(wf_step.tool_id.indexOf("annotate") > -1) {
+		console.log("\t", tool_desc);
+	}
 	for (let inp of tool_desc.inputs) {
-		// console.log("\t", inp);
 		if (! inp.name.startsWith("__")) {
 			let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
 			paramlist += tool_inp.get_formatted_desc();
 		}
-	}
-	if (wf_step.tool_id.indexOf("multiqc") !== -1) {
-		// sysexit();
 	}
 	return render_template(
 		HANDS_ON_TOOL_BOX_TEMPLATE,
@@ -636,7 +635,13 @@ function process_workflow(data, wf_id) {
 		.map(tool => {
 			// Difference from PTDK/planemo: we supply the tool version *additionally* in the URL parameter
 			// This is a workaround *specifically* for tools like Grep1 which changed top level default params between 1.0.1 and 1.0.4
-			return fetch(`https://usegalaxy.eu/api/tools/${tool.tool_id}?io_details=True&link_details=False&tool_version=${tool.tool_version}`)
+			// 
+			const toolURL = new URL(`https://usegalaxy.eu/api/tools/${tool.tool_id}`);
+			toolURL.searchParams.append('io_details', 'True');
+			toolURL.searchParams.append('link_details', 'False');
+			toolURL.searchParams.append('tool_version', tool.tool_version);
+
+			return fetch(toolURL)
 				.then(response => response.json())
 		});
 

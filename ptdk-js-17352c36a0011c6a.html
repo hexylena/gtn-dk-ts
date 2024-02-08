@@ -312,6 +312,10 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [annotateMyIDs](toolshed.g2.bx.psu.edu/repos/iuc/annotatemyids/annotatemyids/3.16.0+galaxy1) %} with the following parameters:
+>    - {% icon param-file %} *"File with IDs"*: `tabular_output` (output of **Column join** {% icon tool %})
+>    - *"File has header?"*: `Yes`
+>    - *"ID Type"*: `Entrez`
+>    - *"Output columns"*: `ENTREZID, SYMBOL, GENENAME`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
