@@ -255,10 +255,11 @@ function get_input_tool_name(step_id, steps){
 
 class ToolInput {
 	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(source === 'y' && optional_tool_id.indexOf('uniq') > -1){
+		if(source === 'y' && optional_tool_id.indexOf('limma') > -1){
 			console.log(`ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
-				'wf_param_values', wf_param_values, 
+				// 'wf_param_values', wf_param_values, 
 				level, should_be_there, force_default, source)
+			this.enable_log = true;
 		}
 
 		// conso
@@ -279,10 +280,11 @@ class ToolInput {
 			console.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
 		}
 		if(this.wf_param_values[this.name] === undefined) {
-			if (should_be_there) {
-				throw new Error(`Parameter ${this.name} not found in wf_param_values`)
+			if (this.should_be_there, should_be_there) {
+				throw new Error(`Parameter ${this.name} not in wf_param_values`)
 			} else {
-				console.log(`Parameter ${this.name} not found in workflow`)
+				console.log(`Parameter ${this.name} not in workflow`)
+				throw new Error(`Parameter ${this.name} not in wf_param_values`)
 			}
 		} else {
 			this.wf_param_values = this.wf_param_values[this.name]
@@ -290,7 +292,7 @@ class ToolInput {
 	}
 
 	get_formatted_inputs() {
-		// console.log('gfi');
+		console.log('gfi');
 		let inputlist = ""
 		let inps = []
 		let icon;
@@ -301,7 +303,7 @@ class ToolInput {
 			}
 		} else {
 			let inp = this.wf_param_values
-			if (inp.id){
+			if (inp.id !== undefined){
 				// Single input or collection
 				let inp_type = this.wf_steps[inp.id].type
 				if (inp_type.indexOf('collection') > -1){
@@ -342,7 +344,7 @@ class ToolInput {
 				// BEGIN DIFF vs original
 				if(Array.isArray(this.wf_param_values)){
 					if(this.wf_param_values.indexOf(option[1]) > -1){
-						console.log(`TAKING ${option[0]}`)
+						// console.log(`TAKING ${option[0]}`)
 						param_values.push(option[0])
 					}
 				} else {
@@ -371,7 +373,7 @@ class ToolInput {
 	}
 
 	get_formatted_conditional_desc(){
-		console.log('gfcd');
+		// console.log('gfcd');
 		let conditional_paramlist = ""
 		let inpp = new ToolInput(
 			this.tool_inp_desc.test_param,
@@ -387,10 +389,8 @@ class ToolInput {
 
 		// Get parameters in the when and their values
 		let tmp_tool_inp_desc = this.tool_inp_desc
-		console.log(tmp_tool_inp_desc)
 		for (let caseC_idx in tmp_tool_inp_desc.cases) {
 			let caseC = tmp_tool_inp_desc.cases[caseC_idx]
-			console.log(caseC.value, cond_param, caseC.inputs.length)
 			if(caseC.value === cond_param && caseC.inputs.length > 0){
 				this.tool_inp_desc = caseC
 				conditional_paramlist += this.get_lower_param_desc()
@@ -404,13 +404,19 @@ class ToolInput {
 		let sub_param_desc = "";
 		for (let inp_idx in this.tool_inp_desc.inputs){
 			let inp = this.tool_inp_desc.inputs[inp_idx]
-			let tool_inp = new ToolInput(
-				inp,
-				this.wf_param_values,
-				this.wf_steps,
-				this.level + 1,
-				false, false, 'x')
-			sub_param_desc += tool_inp.get_formatted_desc()
+			// might throw
+			try {
+				let tool_inp = new ToolInput(
+					inp,
+					this.wf_param_values,
+					this.wf_steps,
+					this.level + 1,
+					false, false, 'x')
+				sub_param_desc += tool_inp.get_formatted_desc()
+			} catch (e) {
+				// This is a difference from planemo, there the error somehow just results in an empty parameter?
+				console.log('error', e)
+			}
 		}
 		return sub_param_desc
 	}
@@ -418,22 +424,23 @@ class ToolInput {
 	get_formatted_repeat_desc(){
 		console.log('gfrd');
 		let repeat_paramlist = "";
-		if (this.wf_param_values != "[]"){ 
-			let tool_inp = {}
-			for (let inp_idx in this.tool_inp_desc.inputs){
-				let inp = this.tool_inp_desc.inputs[inp_idx]
-				// TODO: setdefault
-				tool_inp[inp.name] = inp
-			}
+		if (this.wf_param_values != "[]"){
+			// let tool_inp = {}
+			// for (let inp_idx in this.tool_inp_desc.inputs){
+			// 	let inp = this.tool_inp_desc.inputs[inp_idx]
+			// 	// TODO: setdefault
+			// 	tool_inp[inp.name] = inp
+			// }
 			let tmp_wf_param_values = structuredClone(this.wf_param_values)
 			let cur_level = this.level
 			for (let param_idx in tmp_wf_param_values) {
-				console.log('param_idx', param_idx)
 				let param = tmp_wf_param_values[param_idx]
+				console.log('param_idx', param_idx, param)
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
 				console.log('paramlist_in_repeat', paramlist_in_repeat)
+
 				if(paramlist_in_repeat !== ""){
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
 						space: SPACE.repeat(this.level),
@@ -471,7 +478,7 @@ class ToolInput {
 
 	get_formatted_desc() {
 		if(this.wf_param_values){
-			if(this.type == "data" || this.type == "data_collection"){
+			if(this.type === "data" || this.type === "data_collection"){
 				this.formatted_desc += this.get_formatted_inputs()
 			} else if(this.type == "section"){
 				this.formatted_desc += this.get_formatted_section_desc()
@@ -583,11 +590,10 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	let paramlist = "";
 	console.log(`# Tool ${wf_step.tool_id}`);
 	for (let inp of tool_desc.inputs) {
-		if (inp.name.startsWith("__")) {
-			continue;
+		if (! inp.name.startsWith("__")) {
+			let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
+			paramlist += tool_inp.get_formatted_desc();
 		}
-		let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
-		paramlist += tool_inp.get_formatted_desc();
 	}
 	return render_template(
 		HANDS_ON_TOOL_BOX_TEMPLATE,

@@ -204,6 +204,7 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [Column join](toolshed.g2.bx.psu.edu/repos/iuc/collection_column_join/collection_column_join/0.0.3) %} with the following parameters:
+>    - {% icon param-collection %} *"Tabular files"*: `output` (Input dataset collection)
 >    - *"Number of header lines in each input file"*: `1`
 >
 >    ***TODO***: *Check parameter descriptions*
@@ -278,8 +279,6 @@ A big step can have several subsections or sub steps:
 >        - {% icon param-repeat %} *"Insert Column selections"*
 >            - *"on column"*: `c1`
 >            - *"in"*: `Descending order`
->        - {% icon param-repeat %} *"Insert Column selections"*
->            - *"on column"*: `c2`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -354,9 +353,6 @@ A big step can have several subsections or sub steps:
 >    - In *"Replacement"*:
 >        - {% icon param-repeat %} *"Insert Replacement"*
 >            - *"Find pattern"*: ` uncompressed.fastqsanger`
->        - {% icon param-repeat %} *"Insert Replacement"*
->            - *"Find pattern"*: `2`
->            - *"Replace with:"*: `2`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -401,8 +397,6 @@ A big step can have several subsections or sub steps:
 >        - In *"Contrast"*:
 >            - {% icon param-repeat %} *"Insert Contrast"*
 >                - *"Contrast of Interest"*: `COVID-healthy`
->            - {% icon param-repeat %} *"Insert Contrast"*
->                - *"Contrast of Interest"*: `3`
 >    - In *"Filter Low Counts"*:
 >        - *"Filter lowly expressed genes?"*: `Yes`
 >            - *"Filter on CPM or Count values?"*: `CPM`
