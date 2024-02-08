@@ -238,6 +238,11 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [NanoPlot](toolshed.g2.bx.psu.edu/repos/iuc/nanoplot/nanoplot/1.28.2+galaxy1) %} with the following parameters:
+>    - *"Select multifile mode"*: `batch`
+>        - *"Type of the file(s) to work on"*: `fastq`
+>            - {% icon param-file %} *""*: `output1` (output of **Convert compressed file to uncompressed.** {% icon tool %})
+>    - In *"Options for customizing the plots created"*:
+>        - *"Show the N50 mark in the read length histogram."*: `Yes`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -342,6 +347,11 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [NanoPlot](toolshed.g2.bx.psu.edu/repos/iuc/nanoplot/nanoplot/1.28.2+galaxy1) %} with the following parameters:
+>    - *"Select multifile mode"*: `batch`
+>        - *"Type of the file(s) to work on"*: `fastq`
+>            - {% icon param-file %} *""*: `outfile` (output of **filtlong** {% icon tool %})
+>    - In *"Options for customizing the plots created"*:
+>        - *"Show the N50 mark in the read length histogram."*: `Yes`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -375,6 +385,7 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [Bandage Image](toolshed.g2.bx.psu.edu/repos/iuc/bandage/bandage_image/0.8.1+galaxy2) %} with the following parameters:
+>    - {% icon param-file %} *"Graphical Fragment Assembly"*: `assembly_gfa` (output of **Flye assembly** {% icon tool %})
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -408,6 +419,12 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [Quast](toolshed.g2.bx.psu.edu/repos/iuc/quast/quast/5.0.2+galaxy1) %} with the following parameters:
+>    - *"Use customized names for the input files?"*: `No, use dataset names`
+>        - {% icon param-file %} *"Contigs/scaffolds file"*: `consensus` (output of **Flye assembly** {% icon tool %})
+>    - *"Type of assembly"*: `Genome`
+>        - *"Use a reference genome?"*: `No`
+>    - In *"Genes"*:
+>        - *"Tool for gene prediction"*: `Don't predict genes`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -441,6 +458,9 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [staramr](toolshed.g2.bx.psu.edu/repos/nml/staramr/staramr_search/0.7.1+galaxy2) %} with the following parameters:
+>    - {% icon param-file %} *""*: `consensus` (output of **Flye assembly** {% icon tool %})
+>    - In *"Advanced options"*:
+>        - *"Exclude certain AMR genes from the results"*: `Exclude default list of AMR genes`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -474,6 +494,12 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [Prokka](toolshed.g2.bx.psu.edu/repos/crs4/prokka/prokka/1.14.5+galaxy0) %} with the following parameters:
+>    - {% icon param-file %} *"Contigs to annotate"*: `consensus` (output of **Flye assembly** {% icon tool %})
+>    - *"Force GenBank/ENA/DDJB compliance (--compliant)"*: `No`
+>    - *"Genus name (--genus)"*: `staphylococcus `
+>    - *"Species name (--species)"*: `aureus`
+>    - *"Kingdom (--kingdom)"*: `Bacteria`
+>    - *"Additional outputs"*: `Annotation in GFF3 format, containing both sequences and annotations (.gff), Statistics relating to the annotated features found (.txt)`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
@@ -589,6 +615,36 @@ A big step can have several subsections or sub steps:
 > <hands-on-title> Task description </hands-on-title>
 >
 > 1. {% tool [JBrowse](toolshed.g2.bx.psu.edu/repos/iuc/jbrowse/jbrowse/1.16.9+galaxy0) %} with the following parameters:
+>    - *"Reference genome to display"*: `Use a genome from history`
+>        - {% icon param-file %} *"Select the reference genome"*: `consensus` (output of **Flye assembly** {% icon tool %})
+>    - *"Genetic Code"*: `11. The Bacterial, Archaeal and Plant Plastid Code`
+>    - *"JBrowse-in-Galaxy Action"*: `New JBrowse Instance`
+>    - In *"Track Group"*:
+>        - {% icon param-repeat %} *"Insert Track Group"*
+>            - *"Track Category"*: `Prokka`
+>            - In *"Annotation Track"*:
+>                - {% icon param-repeat %} *"Insert Annotation Track"*
+>                    - *"Track Type"*: `GFF/GFF3/BED Features`
+>                        - {% icon param-file %} *"GFF/GFF3/BED Track Data"*: `out_gff` (output of **Prokka** {% icon tool %})
+>                        - *"Index this track"*: `Yes`
+>                        - *"JBrowse Track Type [Advanced]"*: `Neat Canvas Features`
+>                        - In *"JBrowse Feature Score Scaling & Coloring Options [Advanced]"*:
+>                            - *"Color Score Algorithm"*: `Ignore score`
+>                                - *"Color Selection"*: `Automatically selected`
+>                        - *"Track Visibility"*: `On for new users`
+>        - {% icon param-repeat %} *"Insert Track Group"*
+>            - *"Track Category"*: `AMR`
+>            - In *"Annotation Track"*:
+>                - {% icon param-repeat %} *"Insert Annotation Track"*
+>                    - *"Track Type"*: `GFF/GFF3/BED Features`
+>                        - {% icon param-file %} *"GFF/GFF3/BED Track Data"*: `output` (output of **Table to GFF3** {% icon tool %})
+>                        - *"JBrowse Track Type [Advanced]"*: `Neat Canvas Features`
+>                        - In *"JBrowse Feature Score Scaling & Coloring Options [Advanced]"*:
+>                            - *"Color Score Algorithm"*: `Based on score`
+>                                - *"How should minimum and maximum values be determined for the scores of the features"*: `Automatically determined`
+>                                - *"JBrowse style.color function's color scheme for scored values"*: `Opacity (high scores = 1.0 opacity)`
+>                                    - *"Color Selection"*: `Automatically selected`
+>                        - *"Track Visibility"*: `On for new users`
 >
 >    ***TODO***: *Check parameter descriptions*
 >
