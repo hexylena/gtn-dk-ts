@@ -281,7 +281,9 @@ class ToolInput {
 				throw new Error(`Parameter ${this.name} not in wf_param_values (${optional_tool_id}, ${JSON.stringify(wf_param_values)})`)
 			} else {
 				this.log(`Parameter ${this.name} not in workflow`)
-				// throw new Error(`Parameter ${this.name} not in wf_param_values`)
+				// DIFF from planemo, here we forcibly throw to
+				// prevent any spurious output.
+				throw new Error(`Parameter ${this.name} not in wf_param_values`)
 			}
 		} else {
 			this.wf_param_values = this.wf_param_values[this.name]
