@@ -254,9 +254,9 @@ function get_input_tool_name(step_id, steps){
 
 class ToolInput {
 	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(source === 'y' && optional_tool_id.indexOf('annotate') > -1){
+		if(optional_tool_id.indexOf('multiqc') > -1){
 			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
-				// 'wf_param_values', wf_param_values, 
+				// 'wf_param_values', wf_param_values,
 				level, should_be_there, force_default, source)
 			this.enable_log = true;
 		}
@@ -275,6 +275,7 @@ class ToolInput {
 		this.should_be_there = should_be_there || false
 		this.force_default = force_default || false
 
+		this.log('output_cols', this.name, this.tool_inp_desc)
 		this.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
 		if(this.wf_param_values[this.name] === undefined) {
 			if (this.should_be_there, should_be_there) {
@@ -334,6 +335,7 @@ class ToolInput {
 	}
 
 	get_formatted_other_param_desc(){
+		this.log('gfopd');
 		let param_value;
 		if (this.tool_inp_desc.value == this.wf_param_values && !this.force_default){
 			return "";
@@ -352,7 +354,6 @@ class ToolInput {
 				// BEGIN DIFF vs original
 				if(Array.isArray(this.wf_param_values)){
 					if(this.wf_param_values.indexOf(option[1]) > -1){
-						this.log(`TAKING ${option[0]}`)
 						param_values.push(option[0])
 					}
 				} else {
@@ -411,10 +412,12 @@ class ToolInput {
 	}
 
 	get_lower_param_desc(){
+		this.log('glpd');
 		let sub_param_desc = "";
 		for (let inp_idx in this.tool_inp_desc.inputs){
 			let inp = this.tool_inp_desc.inputs[inp_idx]
 			// might throw
+			// this.log('inp2', JSON.stringify(inp))
 			try {
 				let tool_inp = new ToolInput(
 					inp,
@@ -447,11 +450,11 @@ class ToolInput {
 			let cur_level = this.level
 			for (let param_idx in tmp_wf_param_values) {
 				let param = tmp_wf_param_values[param_idx]
-				this.log('param_idx', param_idx, param)
 				this.wf_param_values = param
 				this.level = cur_level + 1
 				let paramlist_in_repeat = this.get_lower_param_desc()
-				this.log('paramlist_in_repeat', paramlist_in_repeat)
+				this.log('param_idx', param_idx, param)
+				this.log('paramlist_in_repeat', '.', paramlist_in_repeat, '.')
 
 				if(paramlist_in_repeat !== ""){
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
@@ -489,6 +492,7 @@ class ToolInput {
 	}
 
 	get_formatted_desc() {
+		this.log('gfd')
 		if(this.wf_param_values){
 			if(this.type === "data" || this.type === "data_collection"){
 				this.formatted_desc += this.get_formatted_inputs()
@@ -520,7 +524,7 @@ class ToolInput {
 
 function get_wf_param_values(init_params, inp_connection, depth) {
 	// console.log(`${"	".repeat(depth)}get_wf_param_values(${init_params}, ${JSON.stringify(inp_connection)})`);
-	// console.log(`${"	".repeat(depth)}received init_params: ${typeof init_params} ${init_params}`);
+	// console.log(`${"	".repeat(depth)}received init_params: ${typeof init_params} ${JSON.stringify(init_params)}`);
 
 	let form_params = undefined;
 	// check if it's  a str/jsonlike
@@ -529,69 +533,166 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 	} else {
 		form_params = JSON.parse(init_params);
 	}
+
 	// if it's a dict
 	if (Array.isArray(form_params)) {
-		// console.log(`${"	".repeat(depth)}a${form_params} ${Object.prototype.toString.call(form_params)}`);
-		let json_params = form_params;
-		form_params = [];
-		for (let i = 0; i < json_params.length; i++) {
-			let inp = i.toString() in inp_connection ? inp_connection[i] : {};
-			const zz = structuredClone(json_params[i]);
-			form_params.push(get_wf_param_values(zz, inp), depth + 1);
-		}
+		// console.log(`${"	".repeat(depth)}a${JSON.stringify(form_params)} ${Object.prototype.toString.call(form_params)}`);
+
+		// DIFF FROM PLANEMO
+		return form_params.map((p, i) => {
+			// inp = inp_connections[str(i)] if str(i) in inp_connections else {}
+			// form_params.append(get_wf_param_values(p, inp))
+			// XREF: HMM?!
+			// this was accessing it via `input_1` which is technically wrong, the key is supposed to be `input` : {"1": ...}` 
+			// so instad wel'l just make sure that key exists :upside down smiley:
+			let inp = inp_connection[i.toString()] ||  {};
+			// console.log(`${"	".repeat(depth)}iii${JSON.stringify(i)} → ${JSON.stringify(p)} ${JSON.stringify(inp_connection)}`);
+			return get_wf_param_values(p, inp, depth + 1);
+		})
+
 	} else if (typeof form_params === 'string' && form_params.includes('"')) {
-		// console.log(`${"	".repeat(depth)}s${form_params} ${Object.prototype.toString.call(form_params)}`);
-		form_params = form_params.replace(/"/g, '');
+		// console.log(`${"	".repeat(depth)}s${JSON.stringify(form_params)} ${Object.prototype.toString.call(form_params)}`);
+		return form_params.replace(/"/g, '');
 	} else if (Object.prototype.toString.call(form_params) === '[object Object]') {
-		// console.log(`${"	".repeat(depth)}z${form_params} ${Object.prototype.toString.call(form_params)}`);
+		// console.log(`${"	".repeat(depth)}o${JSON.stringify(form_params)} ${Object.prototype.toString.call(form_params)}`);
 		if (form_params.__class__ === 'RuntimeValue' || form_params.__class__ === 'ConnectedValue') {
-			form_params = inp_connection;
+			// console.log(`${"	".repeat(depth)}RuntimeValue ${JSON.stringify(form_params)} ${JSON.stringify(inp_connection)}`);
+			return inp_connection;
 		} else {
-			for (let p in form_params) {
-				let inp = p in inp_connection ? inp_connection[p] : {};
+			// console.log(`${"	".repeat(depth)}hexyform_params ${JSON.stringify(form_params)} ${JSON.stringify(inp_connection)}`);
+
+			let UGH = {};
+			Object.keys(form_params).map((p) => {
+			// for (let p in form_params) {
+				let inp = inp_connection[p.toString()] || {};
+				// console.log(`${"	".repeat(depth)}p${p} ${JSON.stringify(inp_connection[p])} => ${JSON.stringify(inp)}`);
 				// copy the object
-				const zz = structuredClone(form_params[p]);
-				let xx = get_wf_param_values(zz, inp, depth + 1);
-				form_params[p] = xx;
-			}
+				// form_params[p] = get_wf_param_values(structuredClone(form_params[p]), inp, depth + 1);
+				UGH[p] = get_wf_param_values(structuredClone(form_params[p]), inp, depth + 1);
+			});
+			return UGH
 		}
 	}
 	// console.log(`${"	".repeat(depth)} return`, form_params);
 	return form_params;
 }
 
-function get_wf_inputs(step_inp) {
+// expected input
+// "input_connections": {
+//   "results_0|software_cond|output_0|input": {
+//     "id": 11,
+//     "output_name": "text_file"
+//   },
+//   "results_0|software_cond|output_1|input": {
+//     "id": 5,
+//     "output_name": "text_file"
+//   },
+//   "results_1|software_cond|input": {
+//     "id": 3,
+//     "output_name": "report"
+//   },
+//   "results_2|software_cond|input": {
+//     "id": 6,
+//     "output_name": "summary_file"
+//   },
+//   "results_3|software_cond|output_0|type|input": {
+//     "id": 9,
+//     "output_name": "output"
+//   },
+//   "results_3|software_cond|output_1|type|input": {
+//     "id": 10,
+//     "output_name": "outputtxt"
+//   },
+//   "results_4|software_cond|input": {
+//     "id": 8,
+//     "output_name": "output_summary"
+//   }
+// },
+
+
+// expected output
+// {
+//   results: {
+//     '0': {
+//       software_cond: {
+//         output: { '0': { input: { id: 11, output_name: 'text_file' } } }
+//         output: { '1': { input: { id: 5, output_name: 'text_file' } } }
+//       }
+//     },
+//     '1': { software_cond: { input: { id: 3, output_name: 'report' } } },
+//     '2': { software_cond: { input: { id: 6, output_name: 'summary_file' } } },
+//     '3': { software_cond: {
+//         output: {
+//           '0': { type: { input: { id: 9, output_name: 'outputtxt' } } }
+//           '1': { type: { input: { id: 10, output_name: 'outputtxt' } } }
+//         }
+//       }
+//     },
+//     '4': { software_cond: { input: { id: 8, output_name: 'output_summary' } } }
+//   }
+// }
+const repeat_regex = /^(?<prefix>[^\|]*)_(?<nb>\d+)$/;
+
+// BEGIN DIFF TO PLANEMO
+function path2obj(path, obj){
+	// console.log(`path: ${path}, obj: ${JSON.stringify(obj)}`);
+	if (path.length === 0) {
+		return obj;
+	} else {
+		let top_level = path.split('|')[0];
+		let rest = path.split('|').slice(1).join('|');
+		let repeat_search = top_level.match(repeat_regex);
+		if (repeat_search) {
+			return {
+				[repeat_search.groups.prefix]: {[repeat_search.groups.nb.toString()]: path2obj(rest, obj)},
+				// HMM?!
+				[repeat_search.groups.prefix + "_" + repeat_search.groups.nb.toString()]: path2obj(rest, obj)
+			};
+		} else {
+			return {[top_level]: path2obj(rest, obj)};
+		}
+	}
+};
+
+// https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge/61395050#61395050
+function deepAssign(target, ...sources) {
+	for (source of sources) {
+		for (let k in source) {
+			let vs = source[k], vt = target[k]
+			if (Object(vs) == vs && Object(vt) === vt) {
+				target[k] = deepAssign(vt, vs)
+				continue
+			}
+			target[k] = source[k]
+		}
+	}
+	return target
+}
+
+function get_wf_inputs(step_inp, depth) {
 	let inputs = {};
 	for (let inp_n in step_inp) {
 		let inp = step_inp[inp_n];
-		if (inp_n.includes('|')) {
-			let repeat_regex = /(?<prefix>[^\|]*)_(?<nb>\d+)\|(?<suffix>.+).+/;
-			let repeat_search = inp_n.match(repeat_regex);
-			let hier_regex = /(?<prefix>[^\|]*)\|(?<suffix>.+)/;
-			let hier_search = inp_n.match(hier_regex);
-			if (repeat_search && repeat_search.index <= hier_search.index) {
-				inputs[repeat_search.groups.prefix] = inputs[repeat_search.groups.prefix] || {};
-				inputs[repeat_search.groups.prefix][repeat_search.groups.nb] = get_wf_inputs({[hier_search.groups.suffix]: inp});
-			} else {
-				inputs[hier_search.groups.prefix] = inputs[hier_search.groups.prefix] || {};
-				inputs[hier_search.groups.prefix] = Object.assign(inputs[hier_search.groups.prefix], get_wf_inputs({[hier_search.groups.suffix]: inp}));
-			}
-		} else {
-			inputs[inp_n] = inp;
-		}
+		let to_merge = path2obj(inp_n, inp);
+		deepAssign(inputs, to_merge);
 	}
 	return inputs;
 }
-
-
-
+// END DIFF TO PLANEMO
 
 function process_wf_step(wf_step, tool_descs, steps) {
 	// console.log(`process_wf_step(${JSON.stringify(wf_step)}, ${tool_descs})`);
 	let wf_param_values = {};
+
 	if (wf_step.tool_state && wf_step.input_connections) {
 		wf_param_values = get_wf_param_values(wf_step.tool_state, get_wf_inputs(wf_step.input_connections), 0);
 	}
+
+	// if(wf_step.tool_id.indexOf("cutadapt") > -1) {
+	// 	const util = require('util')
+	// 	console.log(util.inspect(get_wf_inputs(wf_step.input_connections, 0), false, null, true /* enable colors */))
+	// 	// sysexit()
+	// }
 
 	// console.log(`wf_param_values:`, wf_param_values);
 	if (!wf_param_values) {
@@ -601,9 +702,6 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	tool_desc = tool_descs[wf_step.tool_id] || {"inputs": []};
 	let paramlist = "";
 	console.log(`# Tool ${wf_step.tool_id}`);
-	if(wf_step.tool_id.indexOf("annotate") > -1) {
-		console.log("\t", tool_desc);
-	}
 	for (let inp of tool_desc.inputs) {
 		if (! inp.name.startsWith("__")) {
 			let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
@@ -621,6 +719,8 @@ function process_wf_step(wf_step, tool_descs, steps) {
 }
 
 function process_workflow(data, wf_id) {
+	const fs = require('fs');
+	fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
 	let steps = Object.keys(data.steps)
 		.map(step_id => {
 			return [step_id, data.steps[step_id]];
@@ -635,7 +735,7 @@ function process_workflow(data, wf_id) {
 		.map(tool => {
 			// Difference from PTDK/planemo: we supply the tool version *additionally* in the URL parameter
 			// This is a workaround *specifically* for tools like Grep1 which changed top level default params between 1.0.1 and 1.0.4
-			// 
+			//
 			const toolURL = new URL(`https://usegalaxy.eu/api/tools/${tool.tool_id}`);
 			toolURL.searchParams.append('io_details', 'True');
 			toolURL.searchParams.append('link_details', 'False');
@@ -664,7 +764,6 @@ function process_workflow(data, wf_id) {
 			.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
 
 		// write to file
-		const fs = require('fs');
 		let zenodo_link = "https://zenodo.org/record/10405036";
 		let z_record;
 		if (zenodo_link.indexOf("doi") > -1) {
@@ -699,7 +798,7 @@ function process_workflow(data, wf_id) {
 
 				fs.writeFile(`ptdk-js-${wf_id}.html`, final_tuto, (err) => {
 					if (err) throw err;
-					console.log('The file has been saved!');
+					console.log(`The file has been saved! ${wf_id}`);
 				})
 			});
 

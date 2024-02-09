@@ -533,6 +533,7 @@ A big step can have several subsections or sub steps:
 >                - *"Outside Radius"*: `0.98`
 >                - *"Inside Radius"*: `0.92`
 >                - *"Plot Type"*: `Stacked Histogram`
+>                    - {% icon param-file %} *"Histogram Data Source"*: `output` (output of **Circos: bigWig to Scatter** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Stroke Color Transparency"*: `0.4`
 >                - *"Minimum / maximum options"*: `Plot all values`
@@ -541,6 +542,7 @@ A big step can have several subsections or sub steps:
 >                - *"Inside Radius"*: `0.6`
 >                - *"Z-index"*: `10`
 >                - *"Plot Type"*: `Scatter`
+>                    - {% icon param-file %} *"Scatter Plot Data Source"*: `out_file1` (output of **Cut** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Glyph"*: `Triangle`
 >                        - *"Glyph Size"*: `6`
@@ -559,12 +561,14 @@ A big step can have several subsections or sub steps:
 >                - *"Outside Radius"*: `0.92`
 >                - *"Inside Radius"*: `0.86`
 >                - *"Plot Type"*: `Histogram`
+>                    - {% icon param-file %} *"Histogram Data Source"*: `output` (output of **Circos: bigWig to Scatter** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Fill Color"*: `#8ff0a4`
 >                - *"Minimum / maximum options"*: `Plot all values`
 >            - {% icon param-repeat %} *"Insert 2D Data Plot"*
 >                - *"Outside Radius"*: `0.86`
 >                - *"Plot Type"*: `Histogram`
+>                    - {% icon param-file %} *"Histogram Data Source"*: `output` (output of **Circos: bigWig to Scatter** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Fill Color"*: `#ffbe6f`
 >                - *"Minimum / maximum options"*: `Plot all values`
@@ -572,6 +576,7 @@ A big step can have several subsections or sub steps:
 >                - *"Outside Radius"*: `0.6`
 >                - *"Inside Radius"*: `0.55`
 >                - *"Plot Type"*: `Text Labels`
+>                    - {% icon param-file %} *"Text Data Source"*: `output` (output of **Circos: Interval to Circos Text Labels** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Label Size"*: `18`
 >                        - *"Show Link"*: `No`
@@ -605,6 +610,7 @@ A big step can have several subsections or sub steps:
 >                - *"Outside Radius"*: `0.7`
 >                - *"Inside Radius"*: `0.6`
 >                - *"Plot Type"*: `Tiles`
+>                    - {% icon param-file %} *"Tile Data Source"*: `output` (output of **Circos: Interval to Tiles** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Fill Color"*: `#1c71d8`
 >                        - *"Overflow Behavior"*: `Hide: overflow tiles are not drawn`
@@ -625,6 +631,7 @@ A big step can have several subsections or sub steps:
 >                - *"Outside Radius"*: `0.53`
 >                - *"Inside Radius"*: `0.45`
 >                - *"Plot Type"*: `Tiles`
+>                    - {% icon param-file %} *"Tile Data Source"*: `output` (output of **Circos: Interval to Tiles** {% icon tool %})
 >                    - In *"Plot Format Specific Options"*:
 >                        - *"Overflow Behavior"*: `Hide: overflow tiles are not drawn`
 >                - *"Orient Inwards"*: `Yes`

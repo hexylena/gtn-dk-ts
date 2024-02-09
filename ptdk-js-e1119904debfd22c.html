@@ -598,6 +598,8 @@ A big step can have several subsections or sub steps:
 >                - In *"FastQC output"*:
 >                    - {% icon param-repeat %} *"Insert FastQC output"*
 >                        - {% icon param-file %} *"FastQC output"*: `text_file` (output of **FastQC** {% icon tool %})
+>                    - {% icon param-repeat %} *"Insert FastQC output"*
+>                        - {% icon param-file %} *"FastQC output"*: `text_file` (output of **FastQC** {% icon tool %})
 >        - {% icon param-repeat %} *"Insert Results"*
 >            - *"Which tool was used generate logs?"*: `Cutadapt/Trim Galore!`
 >                - {% icon param-file %} *"Output of Cutadapt"*: `report` (output of **Cutadapt** {% icon tool %})
@@ -609,6 +611,7 @@ A big step can have several subsections or sub steps:
 >                - In *"RSeQC output"*:
 >                    - {% icon param-repeat %} *"Insert RSeQC output"*
 >                        - *"Type of RSeQC output?"*: `Read distribution`
+>                            - {% icon param-file %} *"RSeQC read distribution: stats output"*: `output` (output of **Read Distribution** {% icon tool %})
 >                    - {% icon param-repeat %} *"Insert RSeQC output"*
 >                        - *"Type of RSeQC output?"*: `Gene body coverage`
 >                            - {% icon param-file %} *"RSeQC gene body coverage:  stats file"*: `outputtxt` (output of **Gene Body Coverage (BAM)** {% icon tool %})
