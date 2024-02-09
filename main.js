@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const HANDS_ON_TOOL_BOX_TEMPLATE = `
 ## Sub-step with **{{tool_name}}**
 
@@ -718,9 +720,33 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	);
 }
 
-function process_workflow(data, wf_id) {
-	const fs = require('fs');
-	fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
+function process_workflow_with_zenodo(bodies, wf_id, zenodo_file_links, zenodo_link) {
+	final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
+		body: bodies,
+		z_file_links: zenodo_file_links.map(e => e.url).sort().join("\n>    "),
+	});
+
+	const final_tuto = render_template(TUTO_HAND_ON_TEMPLATE, {
+		body: final_body,
+		title: "My Tutorial Title",
+		zenodo_link: zenodo_link,
+	});
+
+	let tutorial_name;
+	if(wf_id === undefined){
+		tutorial_name = "tutorial-ptdk-js.md";
+	} else {
+		tutorial_name = `tutorial-ptdk-js-${wf_id}.md`;
+	}
+
+	fs.writeFile(tutorial_name, final_tuto, (err) => {
+		if (err) throw err;
+		console.log(`The file has been saved! ${tutorial_name}`);
+	})
+}
+
+function process_workflow(data, wf_id, zenodo_link) {
+	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
 	let steps = Object.keys(data.steps)
 		.map(step_id => {
 			return [step_id, data.steps[step_id]];
@@ -764,43 +790,32 @@ function process_workflow(data, wf_id) {
 			.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
 
 		// write to file
-		let zenodo_link = "https://zenodo.org/record/10405036";
 		let z_record;
-		if (zenodo_link.indexOf("doi") > -1) {
-			z_record = zenodo_link.split(".").pop();
+		if(zenodo_link !== undefined){
+			if (zenodo_link.indexOf("doi") > -1) {
+				z_record = zenodo_link.split(".").pop();
+			} else {
+				z_record = zenodo_link.split("/").pop();
+			}
+			zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
+
+			fetch(zenodo_link_api)
+				.then(response => response.json())
+				.then(data => {
+					let zenodo_file_links = data.files.map(file => {
+						return {
+							url: file.links.self,
+							src: "url",
+							ext: file.key.split(".").pop() // TODO: map to galaxy
+						}
+					})
+
+					process_workflow_with_zenodo(bodies, wf_id, zenodo_file_links, zenodo_link);
+				});
 		} else {
-			z_record = zenodo_link.split("/").pop();
+			process_workflow_with_zenodo(bodies, wf_id, [], "");
 		}
 
-		zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
-
-		fetch(zenodo_link_api)
-			.then(response => response.json())
-			.then(data => {
-				let zenodo_file_links = data.files.map(file => {
-					return {
-						url: file.links.self,
-						src: "url",
-						ext: file.key.split(".").pop() // TODO: map to galaxy
-					}
-				})
-
-				final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
-					body: bodies,
-					z_file_links: zenodo_file_links.map(e => e.url).sort().join("\n>    "),
-				});
-
-				const final_tuto = render_template(TUTO_HAND_ON_TEMPLATE, {
-					body: final_body,
-					title: "My Tutorial Title",
-					zenodo_link: zenodo_link,
-				});
-
-				fs.writeFile(`ptdk-js-${wf_id}.html`, final_tuto, (err) => {
-					if (err) throw err;
-					console.log(`The file has been saved! ${wf_id}`);
-				})
-			});
 
 	}).catch(err => {
 		console.error(err);
@@ -815,20 +830,46 @@ function process_workflow(data, wf_id) {
 // ]
 
 // argv
-wf_id = process.argv[2];
+// wf_id = process.argv[2];
+
+// parse arguments
+// --wf-id <workflow_id>
+// --wf <workflow_file>
+// --zenodo <zenodo_link>
+
+// wf_path = process.argv[2];
+// parse process.argv:
+args = {}
+for (let i = 2; i < process.argv.length; i += 2) {
+	if (process.argv[i] === "--help" || process.argv[i] === "-h" || process.argv[i + 1] === "--help" || process.argv[i + 1] === "-h") {
+		console.log("Usage: node index.js [--wf-id <workflow_id>|--wf <workflow_file>] --zenodo <zenodo_link>");
+		process.exit(0);
+	}
+	args[process.argv[i].substring(2)] = process.argv[i + 1];
+}
+
+if(args["wf-id"] !== undefined){
+	fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
+		.then(response => response.json())
+		.then(data => {
+			// {
+			// 	err_msg: 'Workflow is not owned by or shared with current user',
+			// 	err_code: 403002
+			// }
+			if (data.err_code) {
+				console.error(data.err_msg);
+				return;
+			}
+			return data
+		})
+		.then(data => process_workflow(data, args["wf-id"], args["zenodo"]));
+} else if(args["wf"] !== undefined){
+	fs.readFile(args["wf"], 'utf8', (err, data) => {
+		if (err) throw err;
+		process_workflow(JSON.parse(data), undefined, args["zenodo"]);
+	});
+} else {
+	console.error("No workflow provided");
+}
 
 // read the workflow from the JSON file
-fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
-	.then(response => response.json())
-	.then(data => {
-		// {
-		// 	err_msg: 'Workflow is not owned by or shared with current user',
-		// 	err_code: 403002
-		// }
-		if (data.err_code) {
-			console.error(data.err_msg);
-			return;
-		}
-		return data
-	})
-	.then(data => process_workflow(data, wf_id));
