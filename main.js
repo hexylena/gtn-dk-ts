@@ -807,27 +807,28 @@ function process_workflow(data, wf_id) {
 	});
 }
 
-const wfs = [
-	'17352c36a0011c6a',
-	'8ca9a936aa3d06af',
-	'4ddbffe4b3fef275',
-	'e1119904debfd22c',
-]
+// const wfs = [
+// 	'17352c36a0011c6a',
+// 	'8ca9a936aa3d06af',
+// 	'4ddbffe4b3fef275',
+// 	'e1119904debfd22c',
+// ]
 
-wfs.forEach(wf_id => {
-	// read the workflow from the JSON file
-	fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
-		.then(response => response.json())
-		.then(data => {
-			// {
-			// 	err_msg: 'Workflow is not owned by or shared with current user',
-			// 	err_code: 403002
-			// }
-			if (data.err_code) {
-				console.error(data.err_msg);
-				return;
-			}
-			return data
-		})
-		.then(data => process_workflow(data, wf_id));
-});
+// argv
+wf_id = process.argv[2];
+
+// read the workflow from the JSON file
+fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
+	.then(response => response.json())
+	.then(data => {
+		// {
+		// 	err_msg: 'Workflow is not owned by or shared with current user',
+		// 	err_code: 403002
+		// }
+		if (data.err_code) {
+			console.error(data.err_msg);
+			return;
+		}
+		return data
+	})
+	.then(data => process_workflow(data, wf_id));
