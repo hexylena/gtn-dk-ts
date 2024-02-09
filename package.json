@@ -1,0 +1,18 @@
+{
+  "name": "ptdk",
+  "version": "1.0.0",
+  "description": "GTN Training Development Kit",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Helena, Bérénice",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}

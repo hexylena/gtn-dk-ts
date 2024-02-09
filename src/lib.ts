@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const HANDS_ON_TOOL_BOX_TEMPLATE = `
 ## Sub-step with **{{tool_name}}**
 
@@ -33,7 +31,7 @@ const HANDS_ON_TOOL_BOX_TEMPLATE = `
 > {: .solution}
 >
 {: .question}
-`
+`;
 
 const TUTO_HAND_ON_BODY_TEMPLATE = `
 # Introduction
@@ -155,8 +153,7 @@ Consider merging some hands-on boxes to have a meaningful flow of the analyses*
 # Conclusion
 
 Sum up the tutorial and the key takeaways here. We encourage adding an overview image of the
-pipeline used.`
-
+pipeline used.`;
 
 const TUTO_HAND_ON_TEMPLATE = `---
 layout: tutorial_hands_on
@@ -189,32 +186,36 @@ contributions:
 ---
 
 {{ body }}
-`
+`;
 
-INPUT_PARAM = `
->{{space}}- *"{{param_label}}"*: \`{{param_value}}\``
+const INPUT_PARAM = `
+>{{space}}- *"{{param_label}}"*: \`{{param_value}}\``;
 
-INPUT_FILE_TEMPLATE = `
->{{space}}- {% icon {{icon}} %} *"{{input_name}}"*: {{input_value}}`
+const INPUT_FILE_TEMPLATE = `
+>{{space}}- {% icon {{icon}} %} *"{{input_name}}"*: {{input_value}}`;
 
-INPUT_SECTION = `
->{{space}}- In *"{{section_label}}"*:`
+const INPUT_SECTION = `
+>{{space}}- In *"{{section_label}}"*:`;
 
-INPUT_ADD_REPEAT = `
->{{space}}- {% icon param-repeat %} *"Insert {{repeat_label}}"*`
+const INPUT_ADD_REPEAT = `
+>{{space}}- {% icon param-repeat %} *"Insert {{repeat_label}}"*`;
 
-SPACE = "    "
+const SPACE = "    ";
 
-
-function render_template(template, data) {
+function render_template(template: string, data) {
 	return template.replace(/{{([^}]*)}}/g, function (a, b) {
 		b = b.trim();
-		if(b == "page.zenodo_link" || b == "page.topic_name" || b == "page.title" || b == "site.baseurl"){
-			return `{{ ${b} }}`
+		if (
+			b == "page.zenodo_link" ||
+			b == "page.topic_name" ||
+			b == "page.title" ||
+			b == "site.baseurl"
+		) {
+			return `{{ ${b} }}`;
 		}
 
-		if(data[b] === undefined){
-			console.log(`Warning: ${b} is not defined in the data`)
+		if (data[b] === undefined) {
+			console.log(`Warning: ${b} is not defined in the data`);
 			return "";
 		}
 
@@ -222,171 +223,209 @@ function render_template(template, data) {
 	});
 }
 
-function to_bool(string_value){
-	if (typeof string_value === "boolean"){
-		return string_value
+function to_bool(string_value: string) {
+	if (typeof string_value === "boolean") {
+		return string_value;
 	}
-	return string_value.toLowerCase() === "true"
+	return string_value.toLowerCase() === "true";
 }
-
 
 function get_empty_input() {
 	return render_template(INPUT_FILE_TEMPLATE, {
 		space: SPACE,
 		icon: "param-file",
 		input_name: "Input file",
-		input_value: "File (empty input)"
-	})
-
+		input_value: "File (empty input)",
+	});
 }
 
-function get_input_tool_name(step_id, steps){
-	let inp_provenance = ""
-	let inp_prov_id = step_id.toString()
-	if (inp_prov_id in steps){
-		let name = steps[inp_prov_id].name
-		if (name.includes("Input dataset")){
-			inp_provenance = `(${name})`
+function get_input_tool_name(step_id, steps) {
+	let inp_provenance = "";
+	let inp_prov_id = step_id.toString();
+	if (inp_prov_id in steps) {
+		let name = steps[inp_prov_id].name;
+		if (name.includes("Input dataset")) {
+			inp_provenance = `(${name})`;
 		} else {
-			inp_provenance = `(output of **${name}** {% icon tool %})`
+			inp_provenance = `(output of **${name}** {% icon tool %})`;
 		}
 	}
-	return inp_provenance
+	return inp_provenance;
 }
 
 class ToolInput {
-	constructor(tool_inp_desc, wf_param_values, wf_steps, level, should_be_there, force_default, source, optional_tool_id) {
-		if(optional_tool_id.indexOf('multiqc') > -1){
-			console.log(`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
+	enable_log: boolean;
+	optional_tool_id: string;
+	name: string;
+	type: any;
+	tool_inp_desc: any;
+	level: number;
+	wf_param_values: any;
+	wf_steps: any;
+	formatted_desc: string;
+	should_be_there: boolean;
+	force_default: boolean;
+
+	constructor(
+		tool_inp_desc,
+		wf_param_values,
+		wf_steps,
+		level: number,
+		should_be_there: boolean,
+		force_default: boolean,
+		source: string,
+		optional_tool_id: string,
+	) {
+		if (optional_tool_id.indexOf("multiqc") > -1) {
+			console.log(
+				`${optional_tool_id} ToolInput ${tool_inp_desc.model_class} "${tool_inp_desc.title || tool_inp_desc.label}"`,
 				// 'wf_param_values', wf_param_values,
-				level, should_be_there, force_default, source)
+				level,
+				should_be_there,
+				force_default,
+				source,
+			);
 			this.enable_log = true;
 		}
-		this.optional_tool_id = optional_tool_id
+		this.optional_tool_id = optional_tool_id;
 
-		this.name = tool_inp_desc.name
-		if (tool_inp_desc.type === undefined){
-			throw new Error(`No type for the parameter ${tool_inp_desc.name}`)
+		this.name = tool_inp_desc.name;
+		if (tool_inp_desc.type === undefined) {
+			throw new Error(`No type for the parameter ${tool_inp_desc.name}`);
 		}
-		this.type = tool_inp_desc.type
-		this.tool_inp_desc = tool_inp_desc
-		this.level = level
-		this.wf_param_values = wf_param_values
-		this.wf_steps = wf_steps
-		this.formatted_desc = ""
-		this.should_be_there = should_be_there || false
-		this.force_default = force_default || false
+		this.type = tool_inp_desc.type;
+		this.tool_inp_desc = tool_inp_desc;
+		this.level = level;
+		this.wf_param_values = wf_param_values;
+		this.wf_steps = wf_steps;
+		this.formatted_desc = "";
+		this.should_be_there = should_be_there || false;
+		this.force_default = force_default || false;
 
-		this.log('output_cols', this.name, this.tool_inp_desc)
-		this.log('output_cols', this.name, this.tool_inp_desc.value, this.wf_param_values[this.name])
-		if(this.wf_param_values[this.name] === undefined) {
-			if (this.should_be_there, should_be_there) {
-				throw new Error(`Parameter ${this.name} not in wf_param_values (${optional_tool_id}, ${JSON.stringify(wf_param_values)})`)
+		this.log("output_cols", this.name, this.tool_inp_desc);
+		this.log(
+			"output_cols",
+			this.name,
+			this.tool_inp_desc.value,
+			this.wf_param_values[this.name],
+		);
+		if (this.wf_param_values[this.name] === undefined) {
+			if ((this.should_be_there, should_be_there)) {
+				throw new Error(
+					`Parameter ${this.name} not in wf_param_values (${optional_tool_id}, ${JSON.stringify(wf_param_values)})`,
+				);
 			} else {
-				this.log(`Parameter ${this.name} not in workflow`)
+				this.log(`Parameter ${this.name} not in workflow`);
 				// DIFF from planemo, here we forcibly throw to
 				// prevent any spurious output.
-				throw new Error(`Parameter ${this.name} not in wf_param_values`)
+				throw new Error(`Parameter ${this.name} not in wf_param_values`);
 			}
 		} else {
-			this.wf_param_values = this.wf_param_values[this.name]
+			this.wf_param_values = this.wf_param_values[this.name];
 		}
 	}
 
-	log(){
-		if(this.enable_log !== undefined){
-			console.log(" ".repeat(this.level), ...arguments)
+	log(...args) {
+		if (this.enable_log !== undefined) {
+			console.log(" ".repeat(this.level), ...args);
 		}
 	}
 
 	get_formatted_inputs() {
-		this.log('gfi');
-		let inputlist = ""
-		let inps = []
+		this.log("gfi");
+		let inputlist = "";
+		let inps = [];
 		let icon;
-		this.log('this.wf_param_values', this.wf_param_values)
+		this.log("this.wf_param_values", this.wf_param_values);
 		if (Array.isArray(this.wf_param_values)) {
-			icon = "param-files"
-			for (let i in this.wf_param_values){
-				inps.push(`\`${i['output_name']}\` ${get_input_tool_name(i['id'], this.wf_steps)}`)
+			icon = "param-files";
+			for (let i in this.wf_param_values) {
+				inps.push(
+					`\`${i["output_name"]}\` ${get_input_tool_name(i["id"], this.wf_steps)}`,
+				);
 			}
 		} else {
-			let inp = this.wf_param_values
+			let inp = this.wf_param_values;
 
-			if (inp.id !== undefined){
+			if (inp.id !== undefined) {
 				// Single input or collection
-				let inp_type = this.wf_steps[inp.id].type
-				if (inp_type.indexOf('collection') > -1){
-					icon = "param-collection"
+				let inp_type = this.wf_steps[inp.id].type;
+				if (inp_type.indexOf("collection") > -1) {
+					icon = "param-collection";
 				} else {
-					icon = 'param-file'
+					icon = "param-file";
 				}
-				inps.push(`\`${inp.output_name}\` ${get_input_tool_name(inp.id, this.wf_steps)}`)
+				inps.push(
+					`\`${inp.output_name}\` ${get_input_tool_name(inp.id, this.wf_steps)}`,
+				);
 			}
 		}
 
-		if (inps.length > 0){
+		if (inps.length > 0) {
 			inputlist += render_template(INPUT_FILE_TEMPLATE, {
 				icon: icon,
 				input_name: this.tool_inp_desc.label,
-				input_value: inps.join(', '),
-				space: SPACE.repeat(this.level)
-			})
+				input_value: inps.join(", "),
+				space: SPACE.repeat(this.level),
+			});
 		}
-		return inputlist
+		return inputlist;
 	}
 
-	get_formatted_other_param_desc(){
-		this.log('gfopd');
+	get_formatted_other_param_desc() {
+		this.log("gfopd");
 		let param_value;
-		if (this.tool_inp_desc.value == this.wf_param_values && !this.force_default){
+		if (
+			this.tool_inp_desc.value == this.wf_param_values &&
+			!this.force_default
+		) {
 			return "";
 			// nothing
 		} else if (this.type == "boolean") {
-			if(to_bool(this.tool_inp_desc.value) === this.wf_param_values){
+			if (to_bool(this.tool_inp_desc.value) === this.wf_param_values) {
 				//nothing
 			} else {
-				param_value = this.wf_param_values ? "Yes" : "No"
+				param_value = this.wf_param_values ? "Yes" : "No";
 			}
 		} else if (this.type == "select") {
-			let param_values = []
-			for (let option_idx in this.tool_inp_desc.options){
-				let option = this.tool_inp_desc.options[option_idx]
-				this.log('option', option, this.wf_param_values)
+			let param_values = [];
+			for (let option_idx in this.tool_inp_desc.options) {
+				let option = this.tool_inp_desc.options[option_idx];
+				this.log("option", option, this.wf_param_values);
 				// BEGIN DIFF vs original
-				if(Array.isArray(this.wf_param_values)){
-					if(this.wf_param_values.indexOf(option[1]) > -1){
-						param_values.push(option[0])
+				if (Array.isArray(this.wf_param_values)) {
+					if (this.wf_param_values.indexOf(option[1]) > -1) {
+						param_values.push(option[0]);
 					}
 				} else {
-					if (option[1] == this.wf_param_values){
-						param_values.push(option[0])
+					if (option[1] == this.wf_param_values) {
+						param_values.push(option[0]);
 						break;
 					}
 				}
 				// END DIFF
 			}
-			param_value = param_values.join(', ')
+			param_value = param_values.join(", ");
 		} else if (this.type == "data_column") {
-			param_value = `c${this.wf_param_values}`
+			param_value = `c${this.wf_param_values}`;
 		} else {
-			param_value = this.wf_param_values
+			param_value = this.wf_param_values;
 		}
 
 		let param_desc = "";
-		if(param_value){
+		if (param_value) {
 			param_desc = render_template(INPUT_PARAM, {
 				param_label: this.tool_inp_desc.label,
 				param_value: param_value,
 				space: SPACE.repeat(this.level),
-			})
+			});
 		}
-		return param_desc
+		return param_desc;
 	}
 
-	get_formatted_conditional_desc(){
-		this.log('gfcd');
-		let conditional_paramlist = ""
+	get_formatted_conditional_desc() {
+		this.log("gfcd");
+		let conditional_paramlist = "";
 		let inpp = new ToolInput(
 			this.tool_inp_desc.test_param,
 			this.wf_param_values,
@@ -394,30 +433,30 @@ class ToolInput {
 			this.level,
 			true,
 			true,
-			'z',
+			"z",
 			this.optional_tool_id,
-		)
-		conditional_paramlist += inpp.get_formatted_desc()
-		let cond_param = inpp.wf_param_values
+		);
+		conditional_paramlist += inpp.get_formatted_desc();
+		let cond_param = inpp.wf_param_values;
 
 		// Get parameters in the when and their values
-		let tmp_tool_inp_desc = this.tool_inp_desc
+		let tmp_tool_inp_desc = this.tool_inp_desc;
 		for (let caseC_idx in tmp_tool_inp_desc.cases) {
-			let caseC = tmp_tool_inp_desc.cases[caseC_idx]
-			if(caseC.value === cond_param && caseC.inputs.length > 0){
-				this.tool_inp_desc = caseC
-				conditional_paramlist += this.get_lower_param_desc()
+			let caseC = tmp_tool_inp_desc.cases[caseC_idx];
+			if (caseC.value === cond_param && caseC.inputs.length > 0) {
+				this.tool_inp_desc = caseC;
+				conditional_paramlist += this.get_lower_param_desc();
 			}
 		}
-		this.tool_inp_desc = tmp_tool_inp_desc
-		return conditional_paramlist
+		this.tool_inp_desc = tmp_tool_inp_desc;
+		return conditional_paramlist;
 	}
 
-	get_lower_param_desc(){
-		this.log('glpd');
+	get_lower_param_desc() {
+		this.log("glpd");
 		let sub_param_desc = "";
-		for (let inp_idx in this.tool_inp_desc.inputs){
-			let inp = this.tool_inp_desc.inputs[inp_idx]
+		for (let inp_idx in this.tool_inp_desc.inputs) {
+			let inp = this.tool_inp_desc.inputs[inp_idx];
 			// might throw
 			// this.log('inp2', JSON.stringify(inp))
 			try {
@@ -426,103 +465,96 @@ class ToolInput {
 					this.wf_param_values,
 					this.wf_steps,
 					this.level + 1,
-					false, false, 'x',
+					false,
+					false,
+					"x",
 					this.optional_tool_id,
-				)
-				sub_param_desc += tool_inp.get_formatted_desc()
+				);
+				sub_param_desc += tool_inp.get_formatted_desc();
 			} catch (e) {
 				// This is a difference from planemo, there the error somehow just results in an empty parameter?
-				this.log('error', e)
+				this.log("error", e);
 			}
 		}
-		return sub_param_desc
+		return sub_param_desc;
 	}
 
-	get_formatted_repeat_desc(){
-		this.log('gfrd');
+	get_formatted_repeat_desc() {
+		this.log("gfrd");
 		let repeat_paramlist = "";
-		if (this.wf_param_values != "[]"){
+		if (this.wf_param_values != "[]") {
 			// let tool_inp = {}
 			// for (let inp_idx in this.tool_inp_desc.inputs){
 			// 	let inp = this.tool_inp_desc.inputs[inp_idx]
 			// 	// TODO: setdefault
 			// 	tool_inp[inp.name] = inp
 			// }
-			let tmp_wf_param_values = structuredClone(this.wf_param_values)
-			let cur_level = this.level
+			let tmp_wf_param_values = structuredClone(this.wf_param_values);
+			let cur_level = this.level;
 			for (let param_idx in tmp_wf_param_values) {
-				let param = tmp_wf_param_values[param_idx]
-				this.wf_param_values = param
-				this.level = cur_level + 1
-				let paramlist_in_repeat = this.get_lower_param_desc()
-				this.log('param_idx', param_idx, param)
-				this.log('paramlist_in_repeat', '.', paramlist_in_repeat, '.')
+				let param = tmp_wf_param_values[param_idx];
+				this.wf_param_values = param;
+				this.level = cur_level + 1;
+				let paramlist_in_repeat = this.get_lower_param_desc();
+				this.log("param_idx", param_idx, param);
+				this.log("paramlist_in_repeat", ".", paramlist_in_repeat, ".");
 
-				if(paramlist_in_repeat !== ""){
+				if (paramlist_in_repeat !== "") {
 					repeat_paramlist += render_template(INPUT_ADD_REPEAT, {
 						space: SPACE.repeat(this.level),
 						repeat_label: this.tool_inp_desc.title,
-					})
-					repeat_paramlist += paramlist_in_repeat
+					});
+					repeat_paramlist += paramlist_in_repeat;
 				}
-				this.level = cur_level
+				this.level = cur_level;
 			}
-			this.wf_param_values = tmp_wf_param_values
+			this.wf_param_values = tmp_wf_param_values;
 		}
 
 		let repeat_desc = "";
-		if (repeat_paramlist !== ""){
-			repeat_desc = render_template(INPUT_SECTION, {
-				space: SPACE.repeat(this.level),
-				section_label: this.tool_inp_desc.title,
-			}) + repeat_paramlist
+		if (repeat_paramlist !== "") {
+			repeat_desc =
+				render_template(INPUT_SECTION, {
+					space: SPACE.repeat(this.level),
+					section_label: this.tool_inp_desc.title,
+				}) + repeat_paramlist;
 		}
-		return repeat_desc
+		return repeat_desc;
 	}
 
-	get_formatted_section_desc(){
-		this.log('gfsd');
+	get_formatted_section_desc() {
+		this.log("gfsd");
 		let section_paramlist = "";
 		let sub_param_desc = this.get_lower_param_desc();
-		if(sub_param_desc != ""){
-			return render_template(INPUT_SECTION, {
-				space: SPACE.repeat(this.level),
-				section_label: this.tool_inp_desc.title,
-			}) + sub_param_desc
+		if (sub_param_desc != "") {
+			return (
+				render_template(INPUT_SECTION, {
+					space: SPACE.repeat(this.level),
+					section_label: this.tool_inp_desc.title,
+				}) + sub_param_desc
+			);
 		}
 		return "";
 	}
 
 	get_formatted_desc() {
-		this.log('gfd')
-		if(this.wf_param_values){
-			if(this.type === "data" || this.type === "data_collection"){
-				this.formatted_desc += this.get_formatted_inputs()
-			} else if(this.type == "section"){
-				this.formatted_desc += this.get_formatted_section_desc()
-			} else if(this.type == "conditional"){
-				this.formatted_desc += this.get_formatted_conditional_desc()
-			} else if(this.type == "repeat"){
-				this.formatted_desc += this.get_formatted_repeat_desc()
+		this.log("gfd");
+		if (this.wf_param_values) {
+			if (this.type === "data" || this.type === "data_collection") {
+				this.formatted_desc += this.get_formatted_inputs();
+			} else if (this.type == "section") {
+				this.formatted_desc += this.get_formatted_section_desc();
+			} else if (this.type == "conditional") {
+				this.formatted_desc += this.get_formatted_conditional_desc();
+			} else if (this.type == "repeat") {
+				this.formatted_desc += this.get_formatted_repeat_desc();
 			} else {
-				this.formatted_desc += this.get_formatted_other_param_desc()
+				this.formatted_desc += this.get_formatted_other_param_desc();
 			}
 		}
-		return this.formatted_desc
+		return this.formatted_desc;
 	}
-
 }
-
-
-
-
-
-
-
-
-
-
-
 
 function get_wf_param_values(init_params, inp_connection, depth) {
 	// console.log(`${"	".repeat(depth)}get_wf_param_values(${init_params}, ${JSON.stringify(inp_connection)})`);
@@ -530,7 +562,7 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 
 	let form_params = undefined;
 	// check if it's  a str/jsonlike
-	if (typeof init_params !== 'string' || !init_params.includes('": ')) {
+	if (typeof init_params !== "string" || !init_params.includes('": ')) {
 		form_params = init_params;
 	} else {
 		form_params = JSON.parse(init_params);
@@ -545,19 +577,23 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 			// inp = inp_connections[str(i)] if str(i) in inp_connections else {}
 			// form_params.append(get_wf_param_values(p, inp))
 			// XREF: HMM?!
-			// this was accessing it via `input_1` which is technically wrong, the key is supposed to be `input` : {"1": ...}` 
+			// this was accessing it via `input_1` which is technically wrong, the key is supposed to be `input` : {"1": ...}`
 			// so instad wel'l just make sure that key exists :upside down smiley:
-			let inp = inp_connection[i.toString()] ||  {};
+			let inp = inp_connection[i.toString()] || {};
 			// console.log(`${"	".repeat(depth)}iii${JSON.stringify(i)} → ${JSON.stringify(p)} ${JSON.stringify(inp_connection)}`);
 			return get_wf_param_values(p, inp, depth + 1);
-		})
-
-	} else if (typeof form_params === 'string' && form_params.includes('"')) {
+		});
+	} else if (typeof form_params === "string" && form_params.includes('"')) {
 		// console.log(`${"	".repeat(depth)}s${JSON.stringify(form_params)} ${Object.prototype.toString.call(form_params)}`);
-		return form_params.replace(/"/g, '');
-	} else if (Object.prototype.toString.call(form_params) === '[object Object]') {
+		return form_params.replace(/"/g, "");
+	} else if (
+		Object.prototype.toString.call(form_params) === "[object Object]"
+	) {
 		// console.log(`${"	".repeat(depth)}o${JSON.stringify(form_params)} ${Object.prototype.toString.call(form_params)}`);
-		if (form_params.__class__ === 'RuntimeValue' || form_params.__class__ === 'ConnectedValue') {
+		if (
+			form_params.__class__ === "RuntimeValue" ||
+			form_params.__class__ === "ConnectedValue"
+		) {
 			// console.log(`${"	".repeat(depth)}RuntimeValue ${JSON.stringify(form_params)} ${JSON.stringify(inp_connection)}`);
 			return inp_connection;
 		} else {
@@ -565,14 +601,18 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 
 			let UGH = {};
 			Object.keys(form_params).map((p) => {
-			// for (let p in form_params) {
+				// for (let p in form_params) {
 				let inp = inp_connection[p.toString()] || {};
 				// console.log(`${"	".repeat(depth)}p${p} ${JSON.stringify(inp_connection[p])} => ${JSON.stringify(inp)}`);
 				// copy the object
 				// form_params[p] = get_wf_param_values(structuredClone(form_params[p]), inp, depth + 1);
-				UGH[p] = get_wf_param_values(structuredClone(form_params[p]), inp, depth + 1);
+				UGH[p] = get_wf_param_values(
+					structuredClone(form_params[p]),
+					inp,
+					depth + 1,
+				);
 			});
-			return UGH
+			return UGH;
 		}
 	}
 	// console.log(`${"	".repeat(depth)} return`, form_params);
@@ -611,7 +651,6 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 //   }
 // },
 
-
 // expected output
 // {
 //   results: {
@@ -636,39 +675,44 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 const repeat_regex = /^(?<prefix>[^\|]*)_(?<nb>\d+)$/;
 
 // BEGIN DIFF TO PLANEMO
-function path2obj(path, obj){
+function path2obj(path, obj) {
 	// console.log(`path: ${path}, obj: ${JSON.stringify(obj)}`);
 	if (path.length === 0) {
 		return obj;
 	} else {
-		let top_level = path.split('|')[0];
-		let rest = path.split('|').slice(1).join('|');
+		let top_level = path.split("|")[0];
+		let rest = path.split("|").slice(1).join("|");
 		let repeat_search = top_level.match(repeat_regex);
 		if (repeat_search) {
 			return {
-				[repeat_search.groups.prefix]: {[repeat_search.groups.nb.toString()]: path2obj(rest, obj)},
+				[repeat_search.groups.prefix]: {
+					[repeat_search.groups.nb.toString()]: path2obj(rest, obj),
+				},
 				// HMM?!
-				[repeat_search.groups.prefix + "_" + repeat_search.groups.nb.toString()]: path2obj(rest, obj)
+				[repeat_search.groups.prefix +
+				"_" +
+				repeat_search.groups.nb.toString()]: path2obj(rest, obj),
 			};
 		} else {
-			return {[top_level]: path2obj(rest, obj)};
+			return { [top_level]: path2obj(rest, obj) };
 		}
 	}
-};
+}
 
 // https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge/61395050#61395050
 function deepAssign(target, ...sources) {
-	for (source of sources) {
+	for (let source of sources) {
 		for (let k in source) {
-			let vs = source[k], vt = target[k]
+			let vs = source[k],
+				vt = target[k];
 			if (Object(vs) == vs && Object(vt) === vt) {
-				target[k] = deepAssign(vt, vs)
-				continue
+				target[k] = deepAssign(vt, vs);
+				continue;
 			}
-			target[k] = source[k]
+			target[k] = source[k];
 		}
 	}
-	return target
+	return target;
 }
 
 function get_wf_inputs(step_inp, depth) {
@@ -687,7 +731,11 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	let wf_param_values = {};
 
 	if (wf_step.tool_state && wf_step.input_connections) {
-		wf_param_values = get_wf_param_values(wf_step.tool_state, get_wf_inputs(wf_step.input_connections), 0);
+		wf_param_values = get_wf_param_values(
+			wf_step.tool_state,
+			get_wf_inputs(wf_step.input_connections, 0),
+			0,
+		);
 	}
 
 	// if(wf_step.tool_id.indexOf("cutadapt") > -1) {
@@ -701,29 +749,43 @@ function process_wf_step(wf_step, tool_descs, steps) {
 		return;
 	}
 
-	tool_desc = tool_descs[wf_step.tool_id] || {"inputs": []};
+	let tool_desc = tool_descs[wf_step.tool_id] || { inputs: [] };
 	let paramlist = "";
 	console.log(`# Tool ${wf_step.tool_id}`);
 	for (let inp of tool_desc.inputs) {
-		if (! inp.name.startsWith("__")) {
-			let tool_inp = new ToolInput(inp, wf_param_values, steps, 1, true, false, 'y', wf_step.tool_id);
+		if (!inp.name.startsWith("__")) {
+			let tool_inp = new ToolInput(
+				inp,
+				wf_param_values,
+				steps,
+				1,
+				true,
+				false,
+				"y",
+				wf_step.tool_id,
+			);
 			paramlist += tool_inp.get_formatted_desc();
 		}
 	}
-	return render_template(
-		HANDS_ON_TOOL_BOX_TEMPLATE,
-		{
-			tool_name: wf_step.name,
-			tool_id: wf_step.tool_id,
-			paramlist: paramlist
-		}
-	);
+	return render_template(HANDS_ON_TOOL_BOX_TEMPLATE, {
+		tool_name: wf_step.name,
+		tool_id: wf_step.tool_id,
+		paramlist: paramlist,
+	});
 }
 
-function process_workflow_with_zenodo(bodies, wf_id, zenodo_file_links, zenodo_link) {
-	final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
+async function process_workflow_with_zenodo(
+	bodies,
+	wf_id,
+	zenodo_file_links,
+	zenodo_link,
+) {
+	const final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
 		body: bodies,
-		z_file_links: zenodo_file_links.map(e => e.url).sort().join("\n>    "),
+		z_file_links: zenodo_file_links
+			.map((e) => e.url)
+			.sort()
+			.join("\n>    "),
 	});
 
 	const final_tuto = render_template(TUTO_HAND_ON_TEMPLATE, {
@@ -733,143 +795,99 @@ function process_workflow_with_zenodo(bodies, wf_id, zenodo_file_links, zenodo_l
 	});
 
 	let tutorial_name;
-	if(wf_id === undefined){
+	if (wf_id === undefined) {
 		tutorial_name = "tutorial-ptdk-js.md";
 	} else {
 		tutorial_name = `tutorial-ptdk-js-${wf_id}.md`;
 	}
 
-	fs.writeFile(tutorial_name, final_tuto, (err) => {
-		if (err) throw err;
-		console.log(`The file has been saved! ${tutorial_name}`);
-	})
+	return [tutorial_name, final_tuto];
 }
 
-function process_workflow(data, wf_id, zenodo_link) {
+function process_workflow(data, wf_id, zenodo_link): [string, string] {
 	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
-	let steps = Object.keys(data.steps)
-		.map(step_id => {
-			return [step_id, data.steps[step_id]];
-		});
+	let steps = Object.keys(data.steps).map((step_id) => {
+		return [step_id, data.steps[step_id]];
+	});
 
 	// Collect tool information
 	let tool_desc_query = steps
 		.map((step) => {
 			return step[1];
 		})
-		.filter(value => { return value.tool_id !== undefined; })
-		.map(tool => {
+		.filter((value) => {
+			return value.tool_id !== undefined;
+		})
+		.map((tool) => {
 			// Difference from PTDK/planemo: we supply the tool version *additionally* in the URL parameter
 			// This is a workaround *specifically* for tools like Grep1 which changed top level default params between 1.0.1 and 1.0.4
 			//
 			const toolURL = new URL(`https://usegalaxy.eu/api/tools/${tool.tool_id}`);
-			toolURL.searchParams.append('io_details', 'True');
-			toolURL.searchParams.append('link_details', 'False');
-			toolURL.searchParams.append('tool_version', tool.tool_version);
+			toolURL.searchParams.append("io_details", "True");
+			toolURL.searchParams.append("link_details", "False");
+			toolURL.searchParams.append("tool_version", tool.tool_version);
 
-			return fetch(toolURL)
-				.then(response => response.json())
+			return fetch(toolURL).then((response) => response.json());
 		});
 
-	Promise.all(tool_desc_query).then(tdq => {
-		let tool_descs = {}
-		tdq.forEach(td => {
-			tool_descs[td.id] = td;
-		});
-		console.log(`Obtained tool descriptions: ${Object.keys(tool_descs).length}`);
+	return Promise.all(tool_desc_query)
+		.then((tdq) => {
+			let tool_descs = {};
+			tdq.forEach((td) => {
+				tool_descs[td.id] = td;
+			});
+			console.log(
+				`Obtained tool descriptions: ${Object.keys(tool_descs).length}`,
+			);
 
-		let pre_steps = steps
-			.map((step) => {
-				return step[1]
-			})
+			let pre_steps = steps.map((step) => {
+				return step[1];
+			});
 
-		let bodies = pre_steps
-			.filter((step) => {
-				return step.type != 'data_input' && step.type != 'data_collection_input';
-			})
-			.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps)).join("");
+			let bodies = pre_steps
+				.filter((step) => {
+					return (
+						step.type != "data_input" && step.type != "data_collection_input"
+					);
+				})
+				.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps))
+				.join("");
 
-		// write to file
-		let z_record;
-		if(zenodo_link !== undefined){
-			if (zenodo_link.indexOf("doi") > -1) {
-				z_record = zenodo_link.split(".").pop();
+			// write to file
+			let z_record;
+			if (zenodo_link !== undefined) {
+				if (zenodo_link.indexOf("doi") > -1) {
+					z_record = zenodo_link.split(".").pop();
+				} else {
+					z_record = zenodo_link.split("/").pop();
+				}
+				let zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
+
+				fetch(zenodo_link_api)
+					.then((response) => response.json())
+					.then((data) => {
+						let zenodo_file_links = data.files.map((file) => {
+							return {
+								url: file.links.self,
+								src: "url",
+								ext: file.key.split(".").pop(), // TODO: map to galaxy
+							};
+						});
+
+						return process_workflow_with_zenodo(
+							bodies,
+							wf_id,
+							zenodo_file_links,
+							zenodo_link,
+						);
+					});
 			} else {
-				z_record = zenodo_link.split("/").pop();
+				return process_workflow_with_zenodo(bodies, wf_id, [], "");
 			}
-			zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
-
-			fetch(zenodo_link_api)
-				.then(response => response.json())
-				.then(data => {
-					let zenodo_file_links = data.files.map(file => {
-						return {
-							url: file.links.self,
-							src: "url",
-							ext: file.key.split(".").pop() // TODO: map to galaxy
-						}
-					})
-
-					process_workflow_with_zenodo(bodies, wf_id, zenodo_file_links, zenodo_link);
-				});
-		} else {
-			process_workflow_with_zenodo(bodies, wf_id, [], "");
-		}
-
-
-	}).catch(err => {
-		console.error(err);
-	});
-}
-
-// const wfs = [
-// 	'17352c36a0011c6a',
-// 	'8ca9a936aa3d06af',
-// 	'4ddbffe4b3fef275',
-// 	'e1119904debfd22c',
-// ]
-
-// argv
-// wf_id = process.argv[2];
-
-// parse arguments
-// --wf-id <workflow_id>
-// --wf <workflow_file>
-// --zenodo <zenodo_link>
-
-// wf_path = process.argv[2];
-// parse process.argv:
-args = {}
-for (let i = 2; i < process.argv.length; i += 2) {
-	if (process.argv[i] === "--help" || process.argv[i] === "-h" || process.argv[i + 1] === "--help" || process.argv[i + 1] === "-h") {
-		console.log("Usage: node index.js [--wf-id <workflow_id>|--wf <workflow_file>] --zenodo <zenodo_link>");
-		process.exit(0);
-	}
-	args[process.argv[i].substring(2)] = process.argv[i + 1];
-}
-
-if(args["wf-id"] !== undefined){
-	fetch(`https://usegalaxy.eu/api/workflows/${wf_id}/download?format=json-download`)
-		.then(response => response.json())
-		.then(data => {
-			// {
-			// 	err_msg: 'Workflow is not owned by or shared with current user',
-			// 	err_code: 403002
-			// }
-			if (data.err_code) {
-				console.error(data.err_msg);
-				return;
-			}
-			return data
 		})
-		.then(data => process_workflow(data, args["wf-id"], args["zenodo"]));
-} else if(args["wf"] !== undefined){
-	fs.readFile(args["wf"], 'utf8', (err, data) => {
-		if (err) throw err;
-		process_workflow(JSON.parse(data), undefined, args["zenodo"]);
-	});
-} else {
-	console.error("No workflow provided");
+		.catch((err) => {
+			console.error(err);
+		});
 }
 
-// read the workflow from the JSON file
+exports.process_workflow = process_workflow;
