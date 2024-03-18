@@ -779,7 +779,7 @@ async function process_workflow_with_zenodo(
 	wf_id,
 	zenodo_file_links,
 	zenodo_link,
-) {
+): Promise<[string, string]> {
 	const final_body = render_template(TUTO_HAND_ON_BODY_TEMPLATE, {
 		body: bodies,
 		z_file_links: zenodo_file_links
@@ -804,7 +804,7 @@ async function process_workflow_with_zenodo(
 	return [tutorial_name, final_tuto];
 }
 
-function process_workflow(data, wf_id, zenodo_link): [string, string] {
+export async function process_workflow(data, wf_id, zenodo_link): Promise<void | [string, string]> {
 	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
 	let steps = Object.keys(data.steps).map((step_id) => {
 		return [step_id, data.steps[step_id]];
@@ -830,7 +830,7 @@ function process_workflow(data, wf_id, zenodo_link): [string, string] {
 			return fetch(toolURL).then((response) => response.json());
 		});
 
-	return Promise.all(tool_desc_query)
+	return await Promise.all(tool_desc_query)
 		.then((tdq) => {
 			let tool_descs = {};
 			tdq.forEach((td) => {
@@ -889,5 +889,3 @@ function process_workflow(data, wf_id, zenodo_link): [string, string] {
 			console.error(err);
 		});
 }
-
-exports.process_workflow = process_workflow;
