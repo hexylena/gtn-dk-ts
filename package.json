@@ -8,16 +8,22 @@
     "dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --require ts-node/register test/*.spec.ts",
+    "build": "tsc"
   },
   "author": "Helena, Bérénice",
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "^4.3.12",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.17",
-    "prettier": "^3.2.5"
+    "chai": "^5.1.0",
+    "mocha": "^10.3.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.2",
     "undici-types": "^6.9.0"
   }
 }

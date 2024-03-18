@@ -202,7 +202,7 @@ const INPUT_ADD_REPEAT = `
 
 const SPACE = "    ";
 
-function render_template(template: string, data) {
+export function render_template(template: string, data): string {
 	return template.replace(/{{([^}]*)}}/g, function (a, b) {
 		b = b.trim();
 		if (
@@ -223,14 +223,14 @@ function render_template(template: string, data) {
 	});
 }
 
-function to_bool(string_value: string) {
+export function to_bool(string_value: string) {
 	if (typeof string_value === "boolean") {
 		return string_value;
 	}
 	return string_value.toLowerCase() === "true";
 }
 
-function get_empty_input() {
+export function get_empty_input() {
 	return render_template(INPUT_FILE_TEMPLATE, {
 		space: SPACE,
 		icon: "param-file",
@@ -239,7 +239,7 @@ function get_empty_input() {
 	});
 }
 
-function get_input_tool_name(step_id, steps) {
+export function get_input_tool_name(step_id, steps) {
 	let inp_provenance = "";
 	let inp_prov_id = step_id.toString();
 	if (inp_prov_id in steps) {
@@ -556,7 +556,7 @@ class ToolInput {
 	}
 }
 
-function get_wf_param_values(init_params, inp_connection, depth) {
+export function get_wf_param_values(init_params, inp_connection, depth) {
 	// console.log(`${"	".repeat(depth)}get_wf_param_values(${init_params}, ${JSON.stringify(inp_connection)})`);
 	// console.log(`${"	".repeat(depth)}received init_params: ${typeof init_params} ${JSON.stringify(init_params)}`);
 
@@ -675,7 +675,7 @@ function get_wf_param_values(init_params, inp_connection, depth) {
 const repeat_regex = /^(?<prefix>[^\|]*)_(?<nb>\d+)$/;
 
 // BEGIN DIFF TO PLANEMO
-function path2obj(path, obj) {
+export function path2obj(path, obj) {
 	// console.log(`path: ${path}, obj: ${JSON.stringify(obj)}`);
 	if (path.length === 0) {
 		return obj;
@@ -700,7 +700,7 @@ function path2obj(path, obj) {
 }
 
 // https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge/61395050#61395050
-function deepAssign(target, ...sources) {
+export function deepAssign(target, ...sources) {
 	for (let source of sources) {
 		for (let k in source) {
 			let vs = source[k],
@@ -715,7 +715,7 @@ function deepAssign(target, ...sources) {
 	return target;
 }
 
-function get_wf_inputs(step_inp, depth) {
+export function get_wf_inputs(step_inp, depth) {
 	let inputs = {};
 	for (let inp_n in step_inp) {
 		let inp = step_inp[inp_n];
@@ -726,7 +726,7 @@ function get_wf_inputs(step_inp, depth) {
 }
 // END DIFF TO PLANEMO
 
-function process_wf_step(wf_step, tool_descs, steps) {
+export function process_wf_step(wf_step, tool_descs, steps) {
 	// console.log(`process_wf_step(${JSON.stringify(wf_step)}, ${tool_descs})`);
 	let wf_param_values = {};
 
@@ -774,7 +774,7 @@ function process_wf_step(wf_step, tool_descs, steps) {
 	});
 }
 
-async function process_workflow_with_zenodo(
+export async function process_workflow_with_zenodo(
 	bodies,
 	wf_id,
 	zenodo_file_links,
