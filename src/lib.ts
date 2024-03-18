@@ -334,7 +334,7 @@ class ToolInput {
 	get_formatted_inputs() {
 		this.log("gfi");
 		let inputlist = "";
-		let inps = [];
+		let inps : string[] = [];
 		let icon;
 		this.log("this.wf_param_values", this.wf_param_values);
 		if (Array.isArray(this.wf_param_values)) {
@@ -389,7 +389,7 @@ class ToolInput {
 				param_value = this.wf_param_values ? "Yes" : "No";
 			}
 		} else if (this.type == "select") {
-			let param_values = [];
+			let param_values: string[] = [];
 			for (let option_idx in this.tool_inp_desc.options) {
 				let option = this.tool_inp_desc.options[option_idx];
 				this.log("option", option, this.wf_param_values);
@@ -561,7 +561,7 @@ export function get_wf_param_values(init_params, inp_connection, depth) {
 	// console.log(`${"	".repeat(depth)}get_wf_param_values(${init_params}, ${JSON.stringify(inp_connection)})`);
 	// console.log(`${"	".repeat(depth)}received init_params: ${typeof init_params} ${JSON.stringify(init_params)}`);
 
-	let form_params = undefined;
+	let form_params : any = undefined;
 	// check if it's  a str/jsonlike
 	if (typeof init_params !== "string" || !init_params.includes('": ')) {
 		form_params = init_params;
