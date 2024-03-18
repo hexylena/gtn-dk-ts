@@ -1,4 +1,4 @@
-const ptdk = require("./src/lib.ts");
+import {process_workflow} from './lib'
 const fs = require("fs");
 
 // const wfs = [
@@ -55,11 +55,11 @@ if (args["wf-id"] !== undefined) {
 			}
 			return data;
 		})
-		.then((data) => ptdk.process_workflow(data, args["wf-id"], args["zenodo"]));
+		.then((data) => process_workflow(data, args["wf-id"], args["zenodo"]));
 } else if (args["wf"] !== undefined) {
 	fs.readFile(args["wf"], "utf8", (err, data) => {
 		if (err) throw err;
-		ptdk.process_workflow(JSON.parse(data), undefined, args["zenodo"]);
+		process_workflow(JSON.parse(data), undefined, args["zenodo"]);
 	});
 } else {
 	console.error("No workflow provided");

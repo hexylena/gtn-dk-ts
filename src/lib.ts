@@ -340,6 +340,7 @@ class ToolInput {
 		if (Array.isArray(this.wf_param_values)) {
 			icon = "param-files";
 			for (let i in this.wf_param_values) {
+				console.log(i['id'], this.wf_steps)
 				inps.push(
 					`\`${i["output_name"]}\` ${get_input_tool_name(i["id"], this.wf_steps)}`,
 				);
