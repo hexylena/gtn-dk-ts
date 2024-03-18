@@ -1,9 +1,8 @@
 import { render_template } from '../src/lib';
 
-
-import * as mocha from 'mocha';
-
-
-let x = render_template('{{ x }} = {{ y }}', {x: 1, y: 'a'});
-let y = "1 = a";
-console.log(x == y);
+describe('testing index file', () => {
+  test('empty string should result in zero', () => {
+    expect(
+        render_template('{{ x }} = {{ y }}', {x: 1, y: 'a'})).toBe("1 = a")
+  });
+});
