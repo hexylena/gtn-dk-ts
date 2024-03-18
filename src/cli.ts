@@ -1,4 +1,4 @@
-import {process_workflow} from './lib'
+import { process_workflow } from "./lib";
 const fs = require("fs");
 
 // const wfs = [

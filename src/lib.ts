@@ -334,13 +334,13 @@ class ToolInput {
 	get_formatted_inputs() {
 		this.log("gfi");
 		let inputlist = "";
-		let inps : string[] = [];
+		let inps: string[] = [];
 		let icon;
 		this.log("this.wf_param_values", this.wf_param_values);
 		if (Array.isArray(this.wf_param_values)) {
 			icon = "param-files";
 			for (let i in this.wf_param_values) {
-				console.log(i['id'], this.wf_steps)
+				console.log(i["id"], this.wf_steps);
 				inps.push(
 					`\`${i["output_name"]}\` ${get_input_tool_name(i["id"], this.wf_steps)}`,
 				);
@@ -561,7 +561,7 @@ export function get_wf_param_values(init_params, inp_connection, depth) {
 	// console.log(`${"	".repeat(depth)}get_wf_param_values(${init_params}, ${JSON.stringify(inp_connection)})`);
 	// console.log(`${"	".repeat(depth)}received init_params: ${typeof init_params} ${JSON.stringify(init_params)}`);
 
-	let form_params : any = undefined;
+	let form_params: any = undefined;
 	// check if it's  a str/jsonlike
 	if (typeof init_params !== "string" || !init_params.includes('": ')) {
 		form_params = init_params;
@@ -805,7 +805,11 @@ export async function process_workflow_with_zenodo(
 	return [tutorial_name, final_tuto];
 }
 
-export async function process_workflow(data, wf_id, zenodo_link): Promise<void | [string, string]> {
+export async function process_workflow(
+	data,
+	wf_id,
+	zenodo_link,
+): Promise<void | [string, string]> {
 	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
 	let steps = Object.keys(data.steps).map((step_id) => {
 		return [step_id, data.steps[step_id]];
