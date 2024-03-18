@@ -239,7 +239,14 @@ export function get_empty_input() {
 	});
 }
 
-export function get_input_tool_name(step_id, steps) {
+export type WorkflowStep = {
+	id: Number,
+	name: string,
+};
+
+export type WorkflowSteps = WorkflowStep[];
+
+export function get_input_tool_name(step_id: string | number, steps: WorkflowSteps) {
 	let inp_provenance = "";
 	let inp_prov_id = step_id.toString();
 	if (inp_prov_id in steps) {
