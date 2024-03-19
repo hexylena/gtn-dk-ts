@@ -862,6 +862,9 @@ export async function obtain_tool_descs(
 		.filter((value) => {
 			return value.tool_id !== undefined;
 		})
+		.filter((value) => {
+			return value.tool_id !== null;
+		})
 		.map((tool) => {
 			// Difference from PTDK/planemo: we supply the tool version *additionally* in the URL parameter
 			// This is a workaround *specifically* for tools like Grep1 which changed top level default params between 1.0.1 and 1.0.4
@@ -871,7 +874,7 @@ export async function obtain_tool_descs(
 			toolURL.searchParams.append("link_details", "False");
 			toolURL.searchParams.append("tool_version", tool.tool_version);
 
-			return fetch(toolURL).then((response) => response.json());
+			return fetch(wrapCors(toolURL)).then((response) => response.json());
 		});
 
 	return await Promise.all(tool_desc_query).then((tdq) => {
@@ -882,6 +885,19 @@ export async function obtain_tool_descs(
 		return tool_descs;
 	});
 }
+
+export function wrapCors(url: string) {
+	return `http://localhost:3000/${url}`;
+}
+
+export async function process_workflow_web(
+	url: string,
+	zenodo_link,
+): Promise<void | [string, string]> {
+	let workflow = await fetch(wrapCors(url + "/json")).then((response) => response.json());
+	return process_workflow(workflow, undefined, undefined);
+}
+
 export async function process_workflow(
 	data,
 	wf_id,
@@ -911,7 +927,7 @@ export async function process_workflow(
 		}
 		let zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
 
-		fetch(zenodo_link_api)
+		fetch(wrapCors(zenodo_link_api))
 			.then((response) => response.json())
 			.then((data) => {
 				let zenodo_file_links = data.files.map((file) => {

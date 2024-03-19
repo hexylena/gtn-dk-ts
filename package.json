@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest",
     "build": "npm run build-web; npm run build-cli",
-    "build-web": "esbuild --outdir=dist/ src/index.ts --sourcemap --minify --platform=browser --bundle",
+    "build-web": "esbuild --outdir=dist/ src/web.ts --sourcemap --platform=browser --bundle",
     "build-cli": "esbuild --outdir=dist/ src/cli.ts --minify --platform=node --bundle",
     "check": "tsc",
     "fmt": "prettier -w src/*.ts",
