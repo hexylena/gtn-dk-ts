@@ -887,7 +887,7 @@ export async function obtain_tool_descs(
 }
 
 export function wrapCors(url: string) {
-	return `http://localhost:3000/${url}`;
+	return `https://cors.apps.galaxyproject.eu/${url}`;
 }
 
 export async function process_workflow_web(
