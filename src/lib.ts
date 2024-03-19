@@ -5,6 +5,10 @@ export type WorkflowStepInputConnection = {
 	};
 };
 
+export type ToolDescriptions = {
+	[key: string]: any;
+};
+
 export type WorkflowStep = {
 	id: Number;
 	name: string;
@@ -755,7 +759,7 @@ export function process_wf_step(
 	wf_step: WorkflowStep,
 	tool_descs,
 	steps: WorkflowStep[],
-) {
+): string {
 	// console.log(`process_wf_step(${JSON.stringify(wf_step)}, ${tool_descs})`);
 	let wf_param_values = {};
 
@@ -775,7 +779,7 @@ export function process_wf_step(
 
 	// console.log(`wf_param_values:`, wf_param_values);
 	if (!wf_param_values) {
-		return;
+		return "";
 	}
 
 	let tool_desc = tool_descs[wf_step.tool_id] || { inputs: [] };
@@ -841,19 +845,11 @@ export async function process_workflow_with_zenodo(
 	return [tutorial_name, final_tuto];
 }
 
-export async function process_workflow(
-	data,
-	wf_id,
-	zenodo_link,
-): Promise<void | [string, string]> {
-	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
-	let steps = flatten_workflow_steps(data.steps);
-
+export async function obtain_tool_descs(
+	steps: WorkflowStep[],
+): Promise<ToolDescriptions> {
 	// Collect tool information
 	let tool_desc_query = steps
-		.map((step) => {
-			return step[1];
-		})
 		.filter((value) => {
 			return value.tool_id !== undefined;
 		})
@@ -869,60 +865,62 @@ export async function process_workflow(
 			return fetch(toolURL).then((response) => response.json());
 		});
 
-	return await Promise.all(tool_desc_query)
-		.then((tdq) => {
-			let tool_descs = {};
-			tdq.forEach((td) => {
-				tool_descs[td.id] = td;
-			});
-			console.log(
-				`Obtained tool descriptions: ${Object.keys(tool_descs).length}`,
-			);
-
-			let pre_steps = steps.map((step) => step[1]);
-
-			let bodies = pre_steps
-				.filter((step) => {
-					return (
-						step.type != "data_input" && step.type != "data_collection_input"
-					);
-				})
-				.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps))
-				.join("");
-
-			// write to file
-			let z_record;
-			if (zenodo_link !== undefined) {
-				if (zenodo_link.indexOf("doi") > -1) {
-					z_record = zenodo_link.split(".").pop();
-				} else {
-					z_record = zenodo_link.split("/").pop();
-				}
-				let zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
-
-				fetch(zenodo_link_api)
-					.then((response) => response.json())
-					.then((data) => {
-						let zenodo_file_links = data.files.map((file) => {
-							return {
-								url: file.links.self,
-								src: "url",
-								ext: file.key.split(".").pop(), // TODO: map to galaxy
-							};
-						});
-
-						return process_workflow_with_zenodo(
-							bodies,
-							wf_id,
-							zenodo_file_links,
-							zenodo_link,
-						);
-					});
-			} else {
-				return process_workflow_with_zenodo(bodies, wf_id, [], "");
-			}
-		})
-		.catch((err) => {
-			console.error(err);
+	return await Promise.all(tool_desc_query).then((tdq) => {
+		let tool_descs = {};
+		tdq.forEach((td) => {
+			tool_descs[td.id] = td;
 		});
+		return tool_descs;
+	});
+}
+export async function process_workflow(
+	data,
+	wf_id,
+	zenodo_link,
+): Promise<void | [string, string]> {
+	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
+	let steps = flatten_workflow_steps(data.steps);
+
+	let tool_descs = await obtain_tool_descs(steps.map((step) => step[1]));
+
+	let pre_steps = steps.map((step) => step[1]);
+
+	let bodies = pre_steps
+		.filter((step) => {
+			return step.type != "data_input" && step.type != "data_collection_input";
+		})
+		.map((wf_step) => process_wf_step(wf_step, tool_descs, pre_steps))
+		.join("");
+
+	// write to file
+	let z_record: string;
+	if (zenodo_link !== undefined) {
+		if (zenodo_link.indexOf("doi") > -1) {
+			z_record = zenodo_link.split(".").pop();
+		} else {
+			z_record = zenodo_link.split("/").pop();
+		}
+		let zenodo_link_api = `https://zenodo.org/api/records/${z_record}`;
+
+		fetch(zenodo_link_api)
+			.then((response) => response.json())
+			.then((data) => {
+				let zenodo_file_links = data.files.map((file) => {
+					return {
+						url: file.links.self,
+						src: "url",
+						ext: file.key.split(".").pop(), // TODO: map to galaxy
+					};
+				});
+
+				return process_workflow_with_zenodo(
+					bodies,
+					wf_id,
+					zenodo_file_links,
+					zenodo_link,
+				);
+			});
+	} else {
+		return process_workflow_with_zenodo(bodies, wf_id, [], "");
+	}
 }
