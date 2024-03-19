@@ -1,8 +1,8 @@
-import { process_wf_step, get_input_tool_name, WorkflowSteps, WorkflowStep, ToolInput, flatten_workflow_steps, obtain_tool_descs } from '../src/lib';
+import { process_wf_step, get_input_tool_name, WorkflowSteps, WorkflowStep, ToolInput, flatten_workflow_steps, obtain_tool_descs, obtain_paramlist } from '../src/lib';
 const fs = require("fs");
 
 const wf = JSON.parse(fs.readFileSync('ex/Galaxy-Workflow-mRNA-Seq_BY-COVID_Pipeline__Analysis.json', "utf-8"));
-
+const tool_descs = JSON.parse(fs.readFileSync('test/tool_descs.json', "utf-8"));
 
 describe(get_input_tool_name, () => {
   test('gets step correctly.', () => {
@@ -18,7 +18,7 @@ describe(get_input_tool_name, () => {
   })
 })
 
-const goseq_desc = `
+const cj_desc = `
 ## Sub-step with **Column join**
 
 > <hands-on-title> Task description </hands-on-title>
@@ -60,15 +60,27 @@ describe('fuck it we ball', () => {
   test('process_wf_step', async () => {
     let step: WorkflowStep = wf.steps["3"];
     let flat = flatten_workflow_steps(wf.steps).map(x => x[1]);
-    let tool_descs = await obtain_tool_descs(flat);
 
     // Check that tool descs looks right.
     let goseq = tool_descs["toolshed.g2.bx.psu.edu/repos/iuc/goseq/goseq/1.50.0+galaxy0"];
     expect(goseq['description']).toBe("tests for overrepresented gene categories")
     expect(goseq['tool_shed_repository']['changeset_revision']).toBe(`602de62d995b`)
 
-    console.log(flat)
     let out = process_wf_step(step, tool_descs, flat)
-    expect(out).toBe(goseq_desc)
+    expect(out).toBe(cj_desc)
+
+    out = obtain_paramlist(step, tool_descs, flat)
+    const cj_params = `
+>    - {% icon param-collection %} *"Tabular files"*: \`output\` (Input dataset collection)
+>    - *"Number of header lines in each input file"*: \`1\``
+    expect(out).toBe(cj_params)
+
+    out = obtain_paramlist(wf.steps["4"], tool_descs, flat)
+    let expectation = `
+>    - {% icon param-collection %} *"Tabular files"*: \`output\` (Input dataset collection)
+>    - *"Number of header lines in each input file"*: \`1\``
+    expect(out).toBe(expectation)
+
+
   })
 })

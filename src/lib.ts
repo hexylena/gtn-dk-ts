@@ -755,7 +755,7 @@ export function get_wf_inputs(step_inp, depth) {
 }
 // END DIFF TO PLANEMO
 
-export function process_wf_step(
+export function obtain_paramlist(
 	wf_step: WorkflowStep,
 	tool_descs,
 	steps: WorkflowStep[],
@@ -800,6 +800,15 @@ export function process_wf_step(
 			paramlist += tool_inp.get_formatted_desc();
 		}
 	}
+	return paramlist
+}
+
+export function process_wf_step (
+	wf_step: WorkflowStep,
+	tool_descs,
+	steps: WorkflowStep[],
+): string {
+	let paramlist = obtain_paramlist(wf_step, tool_descs, steps);
 	return render_template(HANDS_ON_TOOL_BOX_TEMPLATE, {
 		tool_name: wf_step.name,
 		tool_id: wf_step.tool_id,
