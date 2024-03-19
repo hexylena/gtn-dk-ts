@@ -39,6 +39,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 	args[process.argv[i].substring(2)] = process.argv[i + 1];
 }
 
+async function process(){
 if (args["wf-id"] !== undefined) {
 	fetch(
 		`https://usegalaxy.eu/api/workflows/${args["wf-id"]}/download?format=json-download`,
@@ -55,14 +56,21 @@ if (args["wf-id"] !== undefined) {
 			}
 			return data;
 		})
-		.then((data) => process_workflow(data, args["wf-id"], args["zenodo"]));
+		.then(async (data) => {
+			let [title, tuto] = await process_workflow(data, args["wf-id"], args["zenodo"])
+			console.log(tuto)
+		});
 } else if (args["wf"] !== undefined) {
-	fs.readFile(args["wf"], "utf8", (err, data) => {
+	fs.readFile(args["wf"], "utf8", async (err, data) => {
 		if (err) throw err;
-		process_workflow(JSON.parse(data), undefined, args["zenodo"]);
+		let [title, tuto] = await process_workflow(JSON.parse(data), undefined, args["zenodo"]);
+		console.log(tuto)
 	});
 } else {
 	console.error("No workflow provided");
 }
+}
+
+process();
 
 // read the workflow from the JSON file
