@@ -5,7 +5,7 @@
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-		<title>PTDK-JS</title>
+		<title>GTN Training Dev Kit</title>
 	</head>
 	<body>
 		<main class="container">
@@ -13,10 +13,22 @@
 			<input id="url" type="text" placeholder="https://usegalaxy.org/u/jane-doe/w/workflow" class="input">
 			<!-- <input id="zenodo" type="text" placeholder="https://zenodo.org/records/10405036" class="input"> -->
 			<button id="submit" class="btn">Submit</button>
+
+			<button id="copy">Copy</button>
 			<pre id="output" class="code"></pre>
+
+			<script>
+				copy.onclick = function() {
+					output.select();
+					document.execCommand('copy');
+				};
+			</script>
 		</main>
 		<footer class="container">
-			License MIT, hexylena, bebatut
+			<a href="https://github.com/hexylena/gtn-dk-ts/blob/main/LICENSE.txt">MIT Licensed</a>
+			<a href="https://github.com/bebatut">@bebatut</a>
+			<a href="https://github.com/hexylena">@hexylena</a>
+			<a href="https://github.com/hexylena/gtn-dk-ts">Source</a>
 		</footer>
 		<script src="web.js"></script>
 	</body>
