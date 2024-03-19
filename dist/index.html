@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
 		<title>GTN Training Dev Kit</title>
 	</head>
@@ -13,16 +14,11 @@
 			<input id="url" type="text" placeholder="https://usegalaxy.org/u/jane-doe/w/workflow" class="input">
 			<!-- <input id="zenodo" type="text" placeholder="https://zenodo.org/records/10405036" class="input"> -->
 			<button id="submit" class="btn">Submit</button>
+			<button data-clipboard-target="#output">
+				Copy
+			</button>
 
-			<button id="copy">Copy</button>
 			<pre id="output" class="code"></pre>
-
-			<script>
-				copy.onclick = function() {
-					output.select();
-					document.execCommand('copy');
-				};
-			</script>
 		</main>
 		<footer class="container">
 			<a href="https://github.com/hexylena/gtn-dk-ts/blob/main/LICENSE.txt">MIT Licensed</a>
