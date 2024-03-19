@@ -1,3 +1,24 @@
+export type WorkflowStepInputConnection = {
+	[key: string]: {
+		id: number;
+		output_name: string;
+	};
+};
+
+export type WorkflowStep = {
+	id: Number;
+	name: string;
+	tool_state: string; // eww.
+	tool_id: string;
+	tool_version: string;
+	type: string;
+	input_connections: WorkflowStepInputConnection;
+};
+
+export type WorkflowSteps = {
+	[key: string]: WorkflowStep;
+};
+
 const HANDS_ON_TOOL_BOX_TEMPLATE = `
 ## Sub-step with **{{tool_name}}**
 
@@ -239,28 +260,24 @@ export function get_empty_input() {
 	});
 }
 
-export type WorkflowStep = {
-	id: Number,
-	name: string,
-};
-
-export type WorkflowSteps = WorkflowStep[];
-
-export function get_input_tool_name(step_id: string | number, steps: WorkflowSteps) {
-	let inp_provenance = "";
+export function get_input_tool_name(
+	step_id: string | number,
+	steps: WorkflowSteps,
+) {
 	let inp_prov_id = step_id.toString();
-	if (inp_prov_id in steps) {
+	if (steps[inp_prov_id] !== undefined) {
 		let name = steps[inp_prov_id].name;
 		if (name.includes("Input dataset")) {
-			inp_provenance = `(${name})`;
+			return `(${name})`;
 		} else {
-			inp_provenance = `(output of **${name}** {% icon tool %})`;
+			return `(output of **${name}** {% icon tool %})`;
 		}
+	} else {
+		return "";
 	}
-	return inp_provenance;
 }
 
-class ToolInput {
+export class ToolInput {
 	enable_log: boolean;
 	optional_tool_id: string;
 	name: string;
@@ -734,7 +751,11 @@ export function get_wf_inputs(step_inp, depth) {
 }
 // END DIFF TO PLANEMO
 
-export function process_wf_step(wf_step, tool_descs, steps) {
+export function process_wf_step(
+	wf_step: WorkflowStep,
+	tool_descs,
+	steps: WorkflowStep[],
+) {
 	// console.log(`process_wf_step(${JSON.stringify(wf_step)}, ${tool_descs})`);
 	let wf_param_values = {};
 
@@ -782,6 +803,14 @@ export function process_wf_step(wf_step, tool_descs, steps) {
 	});
 }
 
+export function flatten_workflow_steps(
+	steps: WorkflowSteps,
+): [string, WorkflowStep][] {
+	return Object.keys(steps).map((step_id) => {
+		return [step_id, steps[step_id]];
+	});
+}
+
 export async function process_workflow_with_zenodo(
 	bodies,
 	wf_id,
@@ -818,9 +847,7 @@ export async function process_workflow(
 	zenodo_link,
 ): Promise<void | [string, string]> {
 	// fs.writeFileSync(`${wf_id}.json`, JSON.stringify(data, null, 2));
-	let steps = Object.keys(data.steps).map((step_id) => {
-		return [step_id, data.steps[step_id]];
-	});
+	let steps = flatten_workflow_steps(data.steps);
 
 	// Collect tool information
 	let tool_desc_query = steps
@@ -852,9 +879,7 @@ export async function process_workflow(
 				`Obtained tool descriptions: ${Object.keys(tool_descs).length}`,
 			);
 
-			let pre_steps = steps.map((step) => {
-				return step[1];
-			});
+			let pre_steps = steps.map((step) => step[1]);
 
 			let bodies = pre_steps
 				.filter((step) => {
